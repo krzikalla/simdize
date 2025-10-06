@@ -31,16 +31,16 @@ void CHECK_RESULT(size_t index, const stdx::fixed_size_simd<double, vec_size>& r
 void Loop_IntrinsicScatteredSimdReadAccess(benchmark::State& state)
 {
   auto arraySize = state.range(0);
-  constexpr size_t vec_size = stdx::native_simd<double>::size();
+  using SimdModel = stdx::simd<double>;
   std::vector<std::pair<double,double>> testData(arraySize);
   GenerateNWithIndex(testData.begin(), arraySize, [](auto i) { return std::pair{double(i + 1), 3.14}; });
   HeatCache(testData);
   auto dataPtr = testData.data();
   for (auto _ : state)
   {
-    simd_access::loop<vec_size>(0, testData.size(), [&](auto i)
+    simd_access::loop<SimdModel>(0, testData.size(), [&](auto i)
       {
-        stdx::fixed_size_simd<double, vec_size> result;
+        SimdModel result;
 #if (0)
         __m128i vindex {0x200000000ul, 0x600000004ul};
         stdx::__data(result) = _mm256_i32gather_pd(&(dataPtr + i.scalar_index(0))->first, vindex, 8);
@@ -55,14 +55,14 @@ void Loop_IntrinsicScatteredSimdReadAccess(benchmark::State& state)
 void Loop_ScatteredSimdReadAccess(benchmark::State& state)
 {
   auto arraySize = state.range(0);
-  constexpr size_t vec_size = stdx::native_simd<double>::size();
+  using SimdModel = stdx::simd<double>;
   std::vector<std::pair<double,double>> testData(arraySize);
   GenerateNWithIndex(testData.begin(), arraySize, [](auto i) { return std::pair{double(i + 1), 3.14}; });
   HeatCache(testData);
   auto dataPtr = testData.data();
   for (auto _ : state)
   {
-    simd_access::loop<vec_size>(0, testData.size(), [&](auto i)
+    simd_access::loop<SimdModel>(0, testData.size(), [&](auto i)
       {
         auto result = SIMD_ACCESS(dataPtr, i, .first).to_simd();
         benchmark::DoNotOptimize(result);
@@ -75,14 +75,14 @@ void Loop_ScatteredSimdReadAccess(benchmark::State& state)
 void Loop_LinearSimdReadAccess(benchmark::State& state)
 {
   auto arraySize = state.range(0);
-  constexpr size_t vec_size = stdx::native_simd<double>::size();
+  using SimdModel = stdx::simd<double>;
   std::vector<double> testData(arraySize);
   GenerateNWithIndex(testData.begin(), arraySize, [](auto i) { return double(i + 1); });
   HeatCache(testData);
   auto dataPtr = testData.data();
   for (auto _ : state)
   {
-    simd_access::loop<vec_size>(0, testData.size(), [&](auto i)
+    simd_access::loop<SimdModel>(0, testData.size(), [&](auto i)
       {
         auto result = SIMD_ACCESS(dataPtr, i).to_simd();
         benchmark::DoNotOptimize(result);
@@ -95,16 +95,16 @@ void Loop_LinearSimdReadAccess(benchmark::State& state)
 void Loop_LinearInlinedSimdReadAccess(benchmark::State& state)
 {
   auto arraySize = state.range(0);
-  constexpr size_t vec_size = stdx::native_simd<double>::size();
+  using SimdModel = stdx::simd<double>;
   std::vector<double> testData(arraySize);
   GenerateNWithIndex(testData.begin(), arraySize, [](auto i) { return double(i + 1); });
   HeatCache(testData);
   auto dataPtr = testData.data();
   for (auto _ : state)
   {
-    for (size_t i = 0, e = testData.size(); i < e; i += vec_size)
+    for (size_t i = 0, e = testData.size(); i < e; i += SimdModel::size())
     {
-      auto result = stdx::fixed_size_simd<double, vec_size>(dataPtr + i, stdx::element_aligned);
+      auto result = SimdModel(dataPtr + i, stdx::element_aligned);
       benchmark::DoNotOptimize(result);
       CHECK_RESULT(i, result);
     };
@@ -115,7 +115,6 @@ void Loop_LinearInlinedSimdReadAccess(benchmark::State& state)
 void Loop_LinearScalarReadAccess(benchmark::State& state)
 {
   auto arraySize = state.range(0);
-  constexpr size_t vec_size = stdx::native_simd<double>::size();
   std::vector<double> testData(arraySize);
   GenerateNWithIndex(testData.begin(), arraySize, [](auto i) { return double(i + 1); });
   HeatCache(testData);

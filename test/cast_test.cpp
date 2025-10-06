@@ -17,11 +17,11 @@ TestStruct<T> operator*(const T& v1, const TestStruct<T>& v2)
   return TestStruct{v1 * v2.x};
 }
 
-template<int SimdSize, class T>
+template<class SimdModel, class T>
 inline auto simdized_value(const TestStruct<T>& t)
 {
   using simd_access::simdized_value;
-  return TestStruct<decltype(simdized_value<SimdSize>(t.x))>();
+  return TestStruct<decltype(simdized_value<SimdModel>(t.x))>();
 }
 
 template<simd_access::specialization_of<TestStruct>... Args>
@@ -37,7 +37,7 @@ TEST(Cast, DependentContext)
 {
   const int size = 103;
   TestStruct<double> src[size], dest[size];
-  constexpr size_t vec_size = stdx::native_simd<double>::size();
+  using SimdModel = stdx::simd<double>;
   for (int i = 0; i < size; ++i)
   {
     src[i].x = i;
@@ -45,7 +45,7 @@ TEST(Cast, DependentContext)
     dest[i] = 3.0 * src[i];
   }
 
-  simd_access::loop<vec_size>(0, size, [&](auto i)
+  simd_access::loop<SimdModel>(0, size, [&](auto i)
     {
       // this doesn't compile, an explicit cast is needed
       //SIMD_ACCESS(dest, i) = 2.0 * SIMD_ACCESS(src, i);

@@ -16,9 +16,7 @@ TEST(VectorTest, ArrayAdd)
     src2[i] = i * 2;
   }
 
-  constexpr size_t vec_size = stdx::native_simd<double>::size();
-
-  simd_access::loop<vec_size>(0, size, [&](auto i)
+  using SimdModel = stdx::simd<double>;  simd_access::loop<SimdModel>(0, size, [&](auto i)
     {
       dest[i] = csrc1[i] + src2[i];
     });

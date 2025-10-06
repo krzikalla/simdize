@@ -53,17 +53,17 @@ inline void simd_members(FN&& func, typename SrcType::value_type& d, const SrcTy
   func(d, s);
 }
 
-template<int SimdSize, simd_arithmetic T>
+template<class SimdModel, simd_arithmetic T>
 inline auto simdized_value(T)
 {
-  return stdx::fixed_size_simd<T, SimdSize>();
+  return stdx::rebind_simd_t<T, SimdModel>();
 }
 
 // overloads for std types, which can't be added after the template definition, since ADL wouldn't found it
-template<int SimdSize, class T>
+template<class SimdModel, class T>
 inline auto simdized_value(const std::vector<T>& v)
 {
-  std::vector<decltype(simdized_value<SimdSize>(std::declval<T>()))> result(v.size());
+  std::vector<decltype(simdized_value<SimdModel>(std::declval<T>()))> result(v.size());
   return result;
 }
 
@@ -78,10 +78,10 @@ inline void simd_members(auto&& func, Args&&... values)
   }
 }
 
-template<int SimdSize, class T, class U>
+template<class SimdModel, class T, class U>
 inline auto simdized_value(const std::pair<T, U>& v)
 {
-  return std::make_pair(simdized_value<SimdSize>(v.first), simdized_value<SimdSize>(v.second));
+  return std::make_pair(simdized_value<SimdModel>(v.first), simdized_value<SimdModel>(v.second));
 }
 
 template<simd_access::specialization_of<std::pair>... Args>
@@ -98,18 +98,18 @@ inline void simd_members(auto&& func, Args&&... values)
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Deduced type of the scalar structure, of which `SimdSize` number of objects will be combined in a
  *   structure-of-simd.
- * @tparam SimdSize Deduced vector size of the simd type.
+ * @tparam SimdModel Simd type acting as type model.
  * @param location Address of the memory location, at which the first scalar element is stored.
  * @return A simd value.
  */
-template<size_t ElementSize, class T, int SimdSize>
+template<size_t ElementSize, class T, class SimdModel>
   requires (!simd_arithmetic<T>)
-inline auto load(const linear_location<T, SimdSize>& location)
+inline auto load(const linear_location<T, SimdModel>& location)
 {
-  auto result = simdized_value<SimdSize>(*location.base_);
+  auto result = simdized_value<SimdModel>(*location.base_);
   simd_members([&](auto&& dest, auto&& src)
     {
-      dest = load<ElementSize>(linear_location<std::remove_reference_t<decltype(src)>, SimdSize>{&src});
+      dest = load<ElementSize>(linear_location<std::remove_reference_t<decltype(src)>, SimdModel>{&src});
     },
     result, *location.base_);
   return result;
@@ -130,7 +130,7 @@ template<class BaseType, simd_index IndexType>
   requires (!simd_arithmetic<BaseType>)
 inline auto load_rvalue(auto&& base, const IndexType& idx, auto&& subobject)
 {
-  decltype(simdized_value<IndexType::size()>(std::declval<BaseType>())) result;
+  decltype(simdized_value<index_model_t<IndexType>>(std::declval<BaseType>())) result;
   for (decltype(idx.size()) i = 0, e = idx.size(); i < e; ++i)
   {
     simd_members([&](auto&& dest, auto&& src)
@@ -155,7 +155,7 @@ template<class BaseType, simd_index IndexType>
   requires (!simd_arithmetic<BaseType>)
 inline auto load_rvalue(auto&& base, const IndexType& idx)
 {
-  decltype(simdized_value<IndexType::size()>(std::declval<BaseType>())) result;
+  decltype(simdized_value<index_model_t<IndexType>>(std::declval<BaseType>())) result;
   for (decltype(idx.size()) i = 0, e = idx.size(); i < e; ++i)
   {
     simd_members([&](auto&& dest, auto&& src)
@@ -173,20 +173,20 @@ inline auto load_rvalue(auto&& base, const IndexType& idx)
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Deduced type of the scalar structure, of which `SimdSize`number of objects are combined in a
  *   structure-of-simd.
- * @tparam SimdSize Deduced vector size of the simd type.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ExprType Deduced type of the source expression.
  * @param location Address of the memory location, to which the first scalar element is about to be stored.
  * @param expr The expression, whose result is stored. Must be convertible to a structure-of-simd.
  */
-template<size_t ElementSize, class T, class ExprType, int SimdSize>
+template<size_t ElementSize, class T, class ExprType, class SimdModel>
   requires (!simd_arithmetic<T>)
-inline void store(const linear_location<T, SimdSize>& location, const ExprType& expr)
+inline void store(const linear_location<T, SimdModel>& location, const ExprType& expr)
 {
-  const decltype(simdized_value<SimdSize>(std::declval<T>()))& source = expr;
+  const decltype(simdized_value<SimdModel>(std::declval<T>()))& source = expr;
   simd_members([&](auto&& dest, auto&& src)
     {
       store<ElementSize>(
-        linear_location<std::remove_reference_t<decltype(dest)>, SimdSize>{&dest}, src);
+        linear_location<std::remove_reference_t<decltype(dest)>, SimdModel>{&dest}, src);
     },
     *location.base_, source);
 }
@@ -197,19 +197,19 @@ inline void store(const linear_location<T, SimdSize>& location, const ExprType& 
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Deduced type of the scalar structure, of which `SimdSize` number of objects will be combined in a
  *   structure-of-simd.
- * @tparam SimdSize Deduced vector size of the simd type.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ArrayType Deduced type of the array storing the indices.
  * @param location Address and indices of the memory location.
  * @return A simd value.
  */
-template<size_t ElementSize, class T, int SimdSize, class IndexArray>
+template<size_t ElementSize, class T, class SimdModel, class IndexArray>
   requires (!simd_arithmetic<T>)
-inline auto load(const indexed_location<T, SimdSize, IndexArray>& location)
+inline auto load(const indexed_location<T, SimdModel, IndexArray>& location)
 {
-  auto result = simdized_value<SimdSize>(*location.base_);
+  auto result = simdized_value<SimdModel>(*location.base_);
   simd_members([&](auto&& dest, auto&& src)
     {
-      dest = load<ElementSize>(indexed_location<std::remove_reference_t<decltype(src)>, SimdSize, IndexArray>{
+      dest = load<ElementSize>(indexed_location<std::remove_reference_t<decltype(src)>, SimdModel, IndexArray>{
         &src, location.indices_});
     },
     result, *location.base_);
@@ -222,20 +222,20 @@ inline auto load(const indexed_location<T, SimdSize, IndexArray>& location)
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Deduced type of the scalar structure, of which `SimdSize`number of objects are combined in a
  *   structure-of-simd.
- * @tparam SimdSize Deduced vector size of the simd type.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ArrayType Deduced type of the array storing the indices.
  * @tparam ExprType Deduced type of the source expression.
  * @param location Address and indices of the memory location.
  * @param expr The expression, whose result is stored. Must be convertible to a structure-of-simd.
  */
-template<size_t ElementSize, class T, class ExprType, int SimdSize, class IndexArray>
+template<size_t ElementSize, class T, class ExprType, class SimdModel, class IndexArray>
   requires (!simd_arithmetic<T>)
-inline void store(const indexed_location<T, SimdSize, IndexArray>& location, const ExprType& expr)
+inline void store(const indexed_location<T, SimdModel, IndexArray>& location, const ExprType& expr)
 {
-  const decltype(simdized_value<SimdSize>(std::declval<T>()))& source = expr;
+  const decltype(simdized_value<SimdModel>(std::declval<T>()))& source = expr;
   simd_members([&](auto&& dest, auto&& src)
     {
-      using location_type = indexed_location<std::remove_reference_t<decltype(dest)>, SimdSize, IndexArray>;
+      using location_type = indexed_location<std::remove_reference_t<decltype(dest)>, SimdModel, IndexArray>;
       store<ElementSize>(location_type{&dest, location.indices_}, src);
     }, *location.base_, source);
 }

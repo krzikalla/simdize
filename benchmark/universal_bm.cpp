@@ -29,13 +29,13 @@ struct PointIDCollection
 void UniversalSimd(benchmark::State& state)
 {
   auto arraySize = state.range(0);
-  constexpr size_t vec_size = stdx::native_simd<double>::size();
+  using SimdModel = stdx::simd<double>;
   std::vector<double> testData(arraySize, .0);
   benchmark::DoNotOptimize(testData.data());
   PointIDCollection collection{testData.data()};
   for (auto _ : state)
   {
-    simd_access::loop<vec_size>(0, testData.size(), [&](auto i)
+    simd_access::loop<SimdModel>(0, testData.size(), [&](auto i)
       {
         auto point = sa::generate_universal(i, [&](auto idx) { return collection.GetPoint(idx); });
         auto result = SIMD_UNIVERSAL_ACCESS(point, .GetValue());

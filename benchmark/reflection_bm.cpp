@@ -18,11 +18,11 @@ struct Point {
   auto operator+(const Point& op2) const { return Point{ x + op2.x, y + op2.y }; }
 };
 
-template<int SimdSize, class T>
+template<class SimdModel, class T>
 inline auto simdized_value(const Point<T>& t)
 {
   using sa::simdized_value;
-  return Point{simdized_value<SimdSize>(t.x), simdized_value<SimdSize>(t.y)};
+  return Point{simdized_value<SimdModel>(t.x), simdized_value<SimdModel>(t.y)};
 }
 
 template<simd_access::specialization_of<Point>... Args>
@@ -37,13 +37,13 @@ inline void simd_members(auto&& func, Args&&... values)
 void ReflectionSimd(benchmark::State& state)
 {
   auto arraySize = state.range(0);
-  constexpr size_t vec_size = stdx::native_simd<double>::size();
+  using SimdModel = stdx::simd<double>;
   std::vector<Point<double>> x(arraySize, Point{.0, .0}), y(arraySize, Point{.0, .0}), z(arraySize);
   for (auto _ : state)
   {
     benchmark::DoNotOptimize(x.data());
     benchmark::DoNotOptimize(y.data());
-    simd_access::loop<vec_size>(0, z.size(), [&](auto i)
+    simd_access::loop<SimdModel>(0, z.size(), [&](auto i)
     {
       SIMD_ACCESS(z, i) = SIMD_ACCESS(x, i) + SIMD_ACCESS(y, i);
     });

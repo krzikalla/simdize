@@ -60,14 +60,14 @@ struct LValueSeparator<true>
 
   /// Computes the base address of a given array for a linear simd access.
   /**
-   * @tparam SimdSize Deduced simd size (number of vector lanes) of the access.
+   * @tparam SimdModel Simd type acting as type model.
    * @tparam IndexType Deduced integral type of the scalar index.
    * @param base_addr Array base.
    * @param i A linear simd index.
    * @return The address of the starting array element in the element sequence defined by `i`.
    */
-  template<int SimdSize, std::integral IndexType>
-  static auto get_base_address(auto&& base_addr, const index<SimdSize, IndexType>& i)
+  template<class SimdModel, std::integral IndexType>
+  static auto get_base_address(auto&& base_addr, const index<SimdModel, IndexType>& i)
   {
     return &base_addr[i.index_];
   }
@@ -87,15 +87,15 @@ struct LValueSeparator<true>
 
   /// Computes the base address of a member of array elements for an linear simd access.
   /**
-   * @tparam SimdSize Deduced simd size (number of vector lanes) of the access.
+   * @tparam SimdModel Simd type acting as type model.
    * @tparam IndexType Deduced integral type of the scalar index.
    * @param base_addr Array base.
    * @param i A linear simd index.
    * @param subobject A functor yielding a member of the array element.
    * @return The address of the member of the starting array element in the element sequence defined by `i`.
    */
-  template<int SimdSize, std::integral IndexType>
-  static auto get_base_address(auto&& base_addr, const index<SimdSize, IndexType>& i, auto&& subobject)
+  template<class SimdModel, std::integral IndexType>
+  static auto get_base_address(auto&& base_addr, const index<SimdModel, IndexType>& i, auto&& subobject)
   {
     return &subobject(base_addr[i.index_]);
   }
@@ -118,15 +118,15 @@ struct LValueSeparator<true>
   /**
    * @tparam ElementSize Size of an array element.
    * @tparam T Deduced type of the simd-accessed element.
-   * @tparam SimdSize Deduced simd size (number of vector lanes) of the access.
+   * @tparam SimdModel Simd type acting as type model.
    * @tparam IndexType Deduced integral type of the scalar index.
    * @param base Pointer to the first element (or one of its members) in the sequence defined by `i`.
    * @return A value access object (see \ref value_access), which can be used as lhs in assignments.
    */
-  template<size_t ElementSize, class T, int SimdSize, std::integral IndexType>
-  static auto get_direct_value_access(T* base, const index<SimdSize, IndexType>&)
+  template<size_t ElementSize, class T, class SimdModel, std::integral IndexType>
+  static auto get_direct_value_access(T* base, const index<SimdModel, IndexType>&)
   {
-    return make_value_access<ElementSize>(linear_location<T, SimdSize>{base});
+    return make_value_access<ElementSize>(linear_location<T, SimdModel>{base});
   }
 
   /// Creates a value access object for an indirect simd access using indices in `stdx::simd`.
@@ -142,7 +142,7 @@ struct LValueSeparator<true>
   template<size_t ElementSize, class T, std::integral IndexType, class Abi>
   static auto get_direct_value_access(T* base, const stdx::simd<IndexType, Abi>& idx)
   {
-    using location_type = indexed_location<T, stdx::simd<IndexType, Abi>::size(), stdx::simd<IndexType, Abi>>;
+    using location_type = indexed_location<T, stdx::simd<IndexType, Abi>, stdx::simd<IndexType, Abi>>;
     return make_value_access<ElementSize>(location_type{base, idx});
   }
 

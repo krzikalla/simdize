@@ -16,7 +16,7 @@ namespace simd_access
 {
 
 /// Forward declaration
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct universal_simd;
 
 template<typename T>
@@ -30,44 +30,45 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
   stdx_simd<PotentialSimdType> ||
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, int SimdSize>(universal_simd<T, SimdSize>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x)
+    { []<class T, class SimdModel>(universal_simd<T, SimdModel>&){}(x); };
 
 /// Helper class to auto-generate either a `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct auto_simd
 {
   /// Universal simd type.
-  using type = universal_simd<T, SimdSize>;
+  using type = universal_simd<T, SimdModel>;
 };
 
 /// Specialization of \ref auto_simd for the `stdx::simd` variant,
 /**
  * @tparam T Arithmetic value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<simd_arithmetic T, int SimdSize>
-struct auto_simd<T, SimdSize>
+template<simd_arithmetic T, class SimdModel>
+struct auto_simd<T, SimdModel>
 {
   /// stdx::simd type.
-  using type = stdx::fixed_size_simd<T, SimdSize>;
+  using type = stdx::rebind_simd_t<T, SimdModel>;
 };
 
 /// Type which resolves either to `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type. If arithmetic, the resulting type is a `stdx::simd`. Otherwise it is a `universal_simd`.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
-using auto_simd_t = typename auto_simd<T, SimdSize>::type;
+template<class T, class SimdModel>
+using auto_simd_t = typename auto_simd<T, SimdModel>::type;
 
 } //namespace simd_access
 

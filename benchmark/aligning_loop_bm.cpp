@@ -12,7 +12,8 @@
 void AligningLoop_Unaligned(benchmark::State& state)
 {
   auto arraySize = state.range(0);
-  constexpr size_t vec_size = stdx::native_simd<double>::size();
+  using SimdModel = stdx::simd<double>;
+  const auto vec_size = SimdModel::size();
   auto testData =
     std::unique_ptr<double>(reinterpret_cast<double*>(std::aligned_alloc(vec_size * sizeof(double),
       arraySize * sizeof(double))));
@@ -21,7 +22,7 @@ void AligningLoop_Unaligned(benchmark::State& state)
   HeatCache(dataPtr, dataPtr + arraySize);
   for (auto _ : state)
   {
-    simd_access::loop<vec_size>(1, arraySize, [&](auto i)
+    simd_access::loop<SimdModel>(1, arraySize, [&](auto i)
       {
         auto result = SIMD_ACCESS_V(dataPtr, i);
         benchmark::DoNotOptimize(result);
@@ -34,7 +35,8 @@ void AligningLoop_Unaligned(benchmark::State& state)
 void AligningLoop_Aligned(benchmark::State& state)
 {
   auto arraySize = state.range(0);
-  constexpr size_t vec_size = stdx::native_simd<double>::size();
+  using SimdModel = stdx::simd<double>;
+  const auto vec_size = SimdModel::size();
   auto testData =
     std::unique_ptr<double>(reinterpret_cast<double*>(std::aligned_alloc(vec_size * sizeof(double),
       arraySize * sizeof(double))));
@@ -43,7 +45,7 @@ void AligningLoop_Aligned(benchmark::State& state)
   HeatCache(dataPtr, dataPtr + arraySize);
   for (auto _ : state)
   {
-    simd_access::aligning_loop<vec_size>(1, arraySize, [&](auto i) { return i % vec_size == 0; },
+    simd_access::aligning_loop<SimdModel>(1, arraySize, [&](auto i) { return i % vec_size == 0; },
       [&](auto i)
       {
         auto result = SIMD_ACCESS_V(dataPtr, i);

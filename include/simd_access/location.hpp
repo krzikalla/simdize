@@ -16,13 +16,15 @@ namespace simd_access
 /// Specifies a location for a simd variable stored in memory as a consecutive sequence of elements.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct linear_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to the first element of the sequence.
   T* base_;
 
@@ -34,7 +36,7 @@ struct linear_location
   template<auto Member>
   auto member_access() const
   {
-    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize>{&(base_->*Member)};
+    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel>{&(base_->*Member)};
   }
 
   /// Creation of a linear location for an element of `T`, if `T` is an array.
@@ -44,21 +46,23 @@ struct linear_location
    */
   auto array_access(auto i) const
   {
-    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize>{&((*base_)[i])};
+    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel>{&((*base_)[i])};
   }
 };
 
 /// Specifies a location for a simd variable with the indices of its values stored in an array.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ArrayType Type of the array, which stores the indices.
  */
-template<class T, int SimdSize, class ArrayType>
+template<class T, class SimdModel, class ArrayType>
 struct indexed_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to element zero of the sequence.
   T* base_;
   /// Reference to the index array.
@@ -72,7 +76,7 @@ struct indexed_location
   template<auto Member>
   auto member_access() const
   {
-    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel, ArrayType>
       {&(base_->*Member), indices_};
   }
 
@@ -83,7 +87,7 @@ struct indexed_location
    */
   auto array_access(auto i) const
   {
-    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel, ArrayType>
       {&((*base_)[i]), indices_};
   }
 };

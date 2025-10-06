@@ -21,16 +21,16 @@ namespace simd_access
 /// Universal simd class for non-arithmetic value types.
 /**
  * @tparam T Value type.
- * @tparam SimdSize Simd size (number of vector lanes).
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
-struct universal_simd : std::array<T, SimdSize>
+template<class T, class SimdModel>
+struct universal_simd : std::array<T, SimdModel::size()>
 {
   /// Static version of `size()` (as provided by `stdx::simd`, but not by `std::array`).
   /**
    * @return `SimdSize`
    */
-  static constexpr auto size() { return SimdSize; }
+  static constexpr auto size() { return SimdModel::size(); }
 
   /// Generator constructor (as provided by `stdx::simd`).
   /**
@@ -41,10 +41,10 @@ struct universal_simd : std::array<T, SimdSize>
    */
   template<class G>
   explicit universal_simd(G&& generator) :
-    std::array<T, SimdSize>([&]<int... I>(std::integer_sequence<int, I...>) -> std::array<T, SimdSize>
+    std::array<T, size()>([&]<int... I>(std::integer_sequence<int, I...>) -> std::array<T, size()>
       {
         return {{ generator(std::integral_constant<int, I>())... }};
-      } (std::make_integer_sequence<int, SimdSize>())) {}
+      } (std::make_integer_sequence<int, size()>())) {}
 
   /// Default constructor.
   universal_simd() = default;
@@ -76,7 +76,7 @@ template<class IndexType>
   requires(!std::integral<IndexType>)
 inline decltype(auto) generate_universal(const IndexType& idx, auto&& generator)
 {
-  return universal_simd<decltype(generator(scalar_index(idx, 0))), IndexType::size()>([&](auto i)
+  return universal_simd<decltype(generator(scalar_index(idx, 0))), index_model_t<IndexType>>([&](auto i)
     {
       return generator(scalar_index(idx, i));
     });
@@ -100,22 +100,21 @@ inline decltype(auto) universal_access(T&& v, Func&& subobject)
 /// Accesses a subobject (a member or a member function) of a universal simd value. Overloaded for scalar values.
 /**
  * @tparam T Deduced value type of the universal simd.
- * @tparam SimdSize Simd size (number of vector lanes).
+ * @tparam SimdModel Deduced simd type acting as type model.
  * @tparam Func Deduced type of the functor specifying the subobject.
  * @param v Simd value.
  * @param subobject Functor accessing the subobject of one entry in the simd value.
  * @return A simd value holding the result of the calls `subobject(v[i])` for each vector lane.
  */
-template<class T, int SimdSize, class Func>
-inline auto universal_access(const simd_access::universal_simd<T, SimdSize>& v, Func&& subobject)
+template<class T, class SimdModel, class Func>
+inline auto universal_access(const simd_access::universal_simd<T, SimdModel>& v, Func&& subobject)
 {
   using ScalarType = decltype(subobject(static_cast<const std::unwrap_reference_t<T>&>(v[0])));
-  decltype(simdized_value<SimdSize>(std::declval<ScalarType>())) result;
-  for (int i = 0; i < SimdSize; ++i)
+  decltype(simdized_value<SimdModel>(std::declval<ScalarType>())) result;
+  for (int i = 0; i < SimdModel::size(); ++i)
   {
-    simd_members([&](auto&& d, auto&& s)
-    { d[i] = s; },
-    result, subobject(static_cast<const std::unwrap_reference_t<T>&>(v[i])));
+    simd_members([&](auto&& d, auto&& s){ d[i] = s; },
+      result, subobject(static_cast<const std::unwrap_reference_t<T>&>(v[i])));
   }
   return result;
 }

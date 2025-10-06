@@ -11,6 +11,7 @@
 #include "simd_access/base.hpp"
 #include "simd_access/location.hpp"
 #include "simd_access/index.hpp"
+#include <experimental/bits/simd.h>
 
 namespace simd_access
 {
@@ -20,12 +21,13 @@ namespace simd_access
  * stored at the positions base, base+ElementSize, base+2*ElementSize, ...
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Deduced type of a simd element.
- * @tparam SimdSize Deduced vector size of the simd type.
+ * @tparam SimdModel Deduced simd type acting as type model.
+ * @tparam Abi Deduced Abi tag type.
  * @param location Address of the memory location, at which the first simd element is stored.
  * @param source Simd value to be stored.
  */
-template<size_t ElementSize, simd_arithmetic T, int SimdSize>
-inline void store(const linear_location<T, SimdSize>& location, const stdx::fixed_size_simd<T, SimdSize>& source)
+template<size_t ElementSize, simd_arithmetic T, class SimdModel, class Abi>
+inline void store(const linear_location<T, SimdModel>& location, const stdx::simd<T, Abi>& source)
 {
   if constexpr (sizeof(T) == ElementSize)
   {
@@ -34,7 +36,7 @@ inline void store(const linear_location<T, SimdSize>& location, const stdx::fixe
   else
   {
     // scatter with constant pitch
-    for (int i = 0; i < SimdSize; ++i)
+    for (int i = 0; i < source.size(); ++i)
     {
       *reinterpret_cast<T*>(reinterpret_cast<char*>(location.base_) + ElementSize * i) = source[i];
     }
@@ -46,17 +48,17 @@ inline void store(const linear_location<T, SimdSize>& location, const stdx::fixe
  * stored at the positions base+indices[0]*ElementSize, base+indices[1]*ElementSize, ...
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Deduced type of a simd element.
- * @tparam SimdSize Deduced vector size of the simd type.
+ * @tparam SimdModel Deduced simd type acting as type model.
+ * @tparam Abi Deduced Abi tag type.
  * @tparam ArrayType Deduced type of the array storing the indices.
  * @param location Address and indices of the memory location.
  * @param source Simd value to be stored.
  */
-template<size_t ElementSize, simd_arithmetic T, int SimdSize, class ArrayType>
-inline void store(const indexed_location<T, SimdSize, ArrayType>& location,
-  const stdx::fixed_size_simd<T, SimdSize>& source)
+template<size_t ElementSize, simd_arithmetic T, class SimdModel, class Abi, class ArrayType>
+inline void store(const indexed_location<T, SimdModel, ArrayType>& location, const stdx::simd<T, Abi>& source)
 {
   // scatter with indirect indices
-  for (int i = 0; i < SimdSize; ++i)
+  for (int i = 0; i < source.size(); ++i)
   {
     *reinterpret_cast<T*>(reinterpret_cast<char*>(location.base_) + ElementSize * location.indices_[i]) = source[i];
   }
@@ -67,14 +69,14 @@ inline void store(const indexed_location<T, SimdSize, ArrayType>& location,
  * loaded are located at the positions base, base+ElementSize, base+2*ElementSize, ...
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Type of a simd element.
- * @tparam SimdSize Vector size of the simd type.
+ * @tparam SimdModel Deduced simd type acting as type model.
  * @param location Address of the memory location, at which the first scalar element is stored.
  * @return A simd value.
  */
-template<size_t ElementSize, simd_arithmetic T, int SimdSize>
-inline auto load(const linear_location<T, SimdSize>& location)
+template<size_t ElementSize, simd_arithmetic T, class SimdModel>
+inline auto load(const linear_location<T, SimdModel>& location)
 {
-  using ResultType = stdx::fixed_size_simd<std::remove_const_t<T>, SimdSize>;
+  using ResultType = stdx::rebind_simd_t<std::remove_const_t<T>, SimdModel>;
   if constexpr (sizeof(T) == ElementSize)
   {
     return ResultType(location.base_, stdx::element_aligned);
@@ -94,16 +96,17 @@ inline auto load(const linear_location<T, SimdSize>& location)
  * loaded are stored at the positions base+indices[0]*ElementSize, base+indices[1]*ElementSize, ...
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Deduced type of a simd element.
- * @tparam SimdSize Deduced vector size of the simd type.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ArrayType Deduced type of the array storing the indices.
  * @param location Address and indices of the memory location.
  * @return A simd value.
  */
-template<size_t ElementSize, simd_arithmetic T, int SimdSize, class ArrayType>
-inline auto load(const indexed_location<T, SimdSize, ArrayType>& location)
+template<size_t ElementSize, simd_arithmetic T, class SimdModel, class ArrayType>
+inline auto load(const indexed_location<T, SimdModel, ArrayType>& location)
 {
+  using ResultType = stdx::rebind_simd_t<std::remove_const_t<T>, SimdModel>;
   // gather with indirect indices
-  return stdx::fixed_size_simd<std::remove_const_t<T>, SimdSize>([&](int i)
+  return ResultType([&](int i)
     {
       return *reinterpret_cast<const T*>
         (reinterpret_cast<const char*>(location.base_) + ElementSize * location.indices_[i]);
@@ -121,7 +124,8 @@ inline auto load(const indexed_location<T, SimdSize, ArrayType>& location)
 template<simd_arithmetic BaseType, simd_index IndexType>
 inline auto load_rvalue(auto&& base, const IndexType& idx)
 {
-  return stdx::fixed_size_simd<BaseType, IndexType::size()>([&](auto i) { return base[scalar_index(idx, i)]; });
+  using ResultType = stdx::rebind_simd_t<BaseType, index_model_t<IndexType>>;
+  return ResultType([&](auto i) { return base[scalar_index(idx, i)]; });
 }
 
 /**
@@ -137,7 +141,8 @@ inline auto load_rvalue(auto&& base, const IndexType& idx)
 template<simd_arithmetic BaseType, simd_index IndexType>
 inline auto load_rvalue(auto&& base, const IndexType& idx, auto&& subobject)
 {
-  return stdx::fixed_size_simd<BaseType, IndexType::size()>([&](auto i)
+  using ResultType = stdx::rebind_simd_t<BaseType, index_model_t<IndexType>>;
+  return ResultType([&](auto i)
   {
     return subobject(base[scalar_index(idx, i)]);
   });

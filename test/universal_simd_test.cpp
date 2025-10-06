@@ -29,11 +29,11 @@ public:
   const auto& GetPoint() const { return p_; }
 };
 
-template<int SimdSize, class T>
+template<class SimdModel, class T>
 inline auto simdized_value(const Point<T>& t)
 {
   using simd_access::simdized_value;
-  return Point{simdized_value<SimdSize>(t.x_), simdized_value<SimdSize>(t.x_)};
+  return Point{simdized_value<SimdModel>(t.x_), simdized_value<SimdModel>(t.x_)};
 }
 
 template<simd_access::specialization_of<Point>... Args>
@@ -49,15 +49,15 @@ inline void simd_members(auto&& func, Args&&... values)
 
 TEST(UniversalSimdTest, Construct)
 {
-  constexpr size_t vec_size = stdx::native_simd<double>::size();
+  using SimdModel = stdx::simd<double>;
 
-  simd_access::universal_simd<Point<double>, vec_size> v_Point([&](auto i) { return Point<double>{i, i * 2}; });
+  simd_access::universal_simd<Point<double>, SimdModel> v_Point([&](auto i) { return Point<double>{i, i * 2}; });
 
-  simd_access::universal_simd<RestrictiveClass<double>, vec_size> v_Restrict([&](auto i)
+  simd_access::universal_simd<RestrictiveClass<double>, SimdModel> v_Restrict([&](auto i)
     { return RestrictiveClass<double>(Point<double>{i + 1, (i + 1) * 2}); }
   );
 
-  for (size_t i = 0; i < vec_size; ++i)
+  for (size_t i = 0; i < SimdModel::size(); ++i)
   {
     EXPECT_EQ(v_Point[i].x_, i);
     EXPECT_EQ(v_Point[i].y_, i * 2);
@@ -68,15 +68,15 @@ TEST(UniversalSimdTest, Construct)
 
 TEST(UniversalSimdTest, SimdAccess)
 {
-  constexpr size_t vec_size = stdx::native_simd<double>::size();
+  using SimdModel = stdx::simd<double>;
 
-  simd_access::universal_simd<RestrictiveClass<double>, vec_size> v_Restrict([&](auto i)
+  simd_access::universal_simd<RestrictiveClass<double>, SimdModel> v_Restrict([&](auto i)
     { return RestrictiveClass<double>(Point<double>{i + 3, (i + 3) * 3}); }
   );
 
   auto result = simd_access::universal_access(v_Restrict, [&](auto&& element) { return element.GetPoint(); });
 
-  for (size_t i = 0; i < vec_size; ++i)
+  for (size_t i = 0; i < SimdModel::size(); ++i)
   {
     EXPECT_EQ(result.x_[i], i + 3);
     EXPECT_EQ(result.y_[i], (i + 3) * 3);
@@ -86,7 +86,8 @@ TEST(UniversalSimdTest, SimdAccess)
 
 TEST(UniversalSimdTest, IndexAccess)
 {
-  constexpr size_t vec_size = 4;
+  constexpr auto vec_size = 4;
+  using SimdModel = stdx::fixed_size_simd<double, vec_size>;
 
   Point<double> rArray[8];
   for (int i = 0; i < 8; ++i)
@@ -104,7 +105,7 @@ TEST(UniversalSimdTest, IndexAccess)
   }
 
   {
-    simd_access::index<vec_size> index{3};
+    simd_access::index<SimdModel> index{3};
     auto result = simd_access::generate_universal(index, [&](auto i) { return rArray[i]; });
     auto mulResult = SIMD_UNIVERSAL_ACCESS(result, .GetMul());
     for (int i = 0; i < vec_size; ++i)
@@ -116,7 +117,7 @@ TEST(UniversalSimdTest, IndexAccess)
   }
 
   {
-    stdx::fixed_size_simd<size_t, vec_size> index;
+    stdx::rebind_simd_t<size_t, SimdModel> index;
     for (int i = 0; i < vec_size; ++i)
     {
       index[i] = vec_size - i + 3;
@@ -144,8 +145,9 @@ TEST(UniversalSimdTest, Reference)
   };
 
   constexpr size_t vec_size = 2;
+  using SimdModel = stdx::fixed_size_simd<double, vec_size>;
   {
-    simd_access::index<vec_size> index{1};
+    simd_access::index<SimdModel> index{1};
     auto result = simd_access::generate_universal(index, [&](auto i) { return std::cref(rArray[i].GetPoint()); });
     auto xResult = SIMD_UNIVERSAL_ACCESS(result, .x_);
 

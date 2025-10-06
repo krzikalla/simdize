@@ -1,4 +1,5 @@
 
+#include <experimental/bits/simd.h>
 #include <gtest/gtest.h>
 #include <vector>
 #include <algorithm>
@@ -39,9 +40,8 @@ struct TestData
 TEST(Loop, LinearCopy)
 {
   TestData src(true), dest(false);
-  constexpr size_t vec_size = stdx::native_simd<double>::size();
-
-  simd_access::loop<vec_size>(0, src.size, [&](auto i)
+  using SimdModel = stdx::simd<double>;
+  simd_access::loop<SimdModel>(0, src.size, [&](auto i)
     {
       SIMD_ACCESS(dest.a, i) = SIMD_ACCESS(src.a, i) * 2;
       SIMD_ACCESS(dest.a_subarr, i, [0]) = SIMD_ACCESS(src.a_subarr, i, [0]) * 3;
@@ -61,10 +61,9 @@ TEST(Loop, IndirectCopy)
   std::iota(indices.begin(), indices.end(), 0);
   std::mt19937 g(1);
   std::shuffle(indices.begin(), indices.end(), g);
-  constexpr size_t vec_size = stdx::native_simd<double>::size();
-
+  using SimdModel = stdx::simd<double>;
   int linear_index = 0;
-  simd_access::loop<vec_size>(indices.begin(), indices.end(), [&](auto i)
+  simd_access::loop<SimdModel>(indices.begin(), indices.end(), [&](auto i)
     {
       auto x = SIMD_ACCESS(src.a, i) * 1;
       simd_access::elementwise([&](auto&& v)
@@ -83,15 +82,15 @@ TEST(Loop, ResidualLoop)
 {
   constexpr auto full_size = 64;
   constexpr auto dest_offset = 1001;
-  constexpr size_t vec_size = stdx::native_simd<double>::size();
-  constexpr size_t partial_size = full_size - vec_size + 1;
+  using SimdModel = stdx::simd<double>;
+  constexpr size_t partial_size = full_size - SimdModel::size() + 1;
   double src[full_size], dest[full_size];
   auto fill_dest = [&]()
     { std::iota(dest, dest + full_size, dest_offset); };
 
   std::iota(src, src + full_size, 0);
   fill_dest();
-  simd_access::loop<vec_size>(0, partial_size, [&](auto i)
+  simd_access::loop<SimdModel>(0, partial_size, [&](auto i)
     {
       SIMD_ACCESS(dest, i) = SIMD_ACCESS(src, i) * 2;
     });
@@ -106,7 +105,7 @@ TEST(Loop, ResidualLoop)
   }
 
   fill_dest();
-  simd_access::loop<vec_size>(0, partial_size, [&](auto i)
+  simd_access::loop<SimdModel>(0, partial_size, [&](auto i)
     {
       SIMD_ACCESS(dest, i) = SIMD_ACCESS(src, i) * 2;
     }, simd_access::VectorResidualLoop);
@@ -121,9 +120,9 @@ TEST(Loop, ResidualLoop)
 TEST(Loop, AligningCopy)
 {
   TestData src(true), dest(false);
-  constexpr size_t vec_size = stdx::native_simd<double>::size();
+  using SimdModel = stdx::fixed_size_simd<double, 4>;
   std::vector<char> simdRecorder(src.size, 0);
-  simd_access::aligning_loop<vec_size>(3, src.size, [](auto i) { return i % 4 == 0; },
+  simd_access::aligning_loop<SimdModel>(3, src.size, [](auto i) { return i % 4 == 0; },
     [&](auto i)
     {
       if constexpr (simd_access::is_simd_index(i))
@@ -155,7 +154,7 @@ TEST(Loop, AligningCopy)
         EXPECT_EQ(i % 4, 0);
         break;
       case 2:
-        EXPECT_LT(src.size - i, vec_size);
+        EXPECT_LT(src.size - i, SimdModel::size());
         break;
       default:
         EXPECT_EQ(simdRecorder[i], 0);  // deliberately fails and prints simdRecorder[i]

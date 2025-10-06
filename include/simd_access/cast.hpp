@@ -43,7 +43,7 @@ struct simdized_by_index<T, IndexType>
 template<class T, simd_index IndexType>
 struct simdized_by_index<T, IndexType>
 {
-  using type = decltype(simdized_value<IndexType::size()>(std::declval<T>()));
+  using type = decltype(simdized_value<index_model_t<IndexType>>(std::declval<T>()));
 };
 
 /// Type which resolves either to `T` or - if `IndexType` is a simd index - to the simdized type of `T`.

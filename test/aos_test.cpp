@@ -18,11 +18,11 @@ Point<T> operator+(const Point<T>& p1, const Point<T>& p2)
   return Point<T>{p1.x + p2.x, p1.y + p2.y};
 }
 
-template<int SimdSize, class T>
+template<class SimdModel, class T>
 inline auto simdized_value(const Point<T>& p)
 {
   using simd_access::simdized_value;
-  return Point<decltype(simdized_value<SimdSize>(p.x))>();
+  return Point<decltype(simdized_value<SimdModel>(p.x))>();
 }
 
 template<simd_access::specialization_of<Point>... Args>
@@ -46,9 +46,8 @@ TEST(AosTest, LinearAddition)
     src2[i].y = i * 4;
   }
 
-  constexpr size_t vec_size = stdx::native_simd<double>::size();
-
-  simd_access::loop<vec_size>(0, size, [&](auto i)
+  using SimdModel = stdx::simd<double>;
+  simd_access::loop<SimdModel>(0, size, [&](auto i)
     {
       SIMD_ACCESS(dest, i) = SIMD_ACCESS(src1, i) + SIMD_ACCESS(src2, i);
     });
@@ -73,9 +72,8 @@ TEST(AosTest, IndirectAddition)
   }
   const int indices[10] = { 3, 2, 1, 3, 2, 1, 3, 2, 1, 0 };
 
-  constexpr size_t vec_size = stdx::native_simd<double>::size();
-
-  simd_access::loop_with_linear_index<vec_size>(indices, indices + size, [&](auto linear_index, auto i)
+  using SimdModel = stdx::simd<double>;
+  simd_access::loop_with_linear_index<SimdModel>(indices, indices + size, [&](auto linear_index, auto i)
     {
       SIMD_ACCESS(dest, linear_index) = SIMD_ACCESS(src1, i) + SIMD_ACCESS(src2, i);
     });

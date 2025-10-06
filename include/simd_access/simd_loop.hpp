@@ -28,7 +28,7 @@ constexpr auto VectorResidualLoop = VectorResidualLoopT();
 /**
  * Linear simd-ized iteration over a function. The function is first called with a simd index and the remainder
  * loop is called with an integral index.
- * @tparam SimdSize Vector size.
+ * @tparam SimdModel Simd type acting as type model.
  * @param start Start of the iteration range [start, end).
  * @param end End of the iteration range [start, end).
  * @param fn Generic function to be called. Takes one argument, whose type is either `index<SimdSize, IntegralType>`
@@ -38,14 +38,15 @@ constexpr auto VectorResidualLoop = VectorResidualLoopT();
  *   case the user is responsible for the handling of indices possbily extending the valid iteration range. Defaults
  *   to `ScalarResidualLoop`.
  */
-template<int SimdSize, auto ... Args, typename ResidualLoopPolicyType = ScalarResidualLoopT>
+template<class SimdModel, auto ... Args, typename ResidualLoopPolicyType = ScalarResidualLoopT>
 inline void loop(std::integral auto start, std::integral auto end, auto&& fn,
   ResidualLoopPolicyType residualLoopPolicy = ScalarResidualLoop)
 {
   using IndexType = std::common_type_t<decltype(start), decltype(end)>;
-  index<SimdSize, IndexType> simd_i{IndexType(start)};
-  constexpr auto endOffset = residualLoopPolicy == ScalarResidualLoop ? 1 : SimdSize;
-  for (; simd_i.index_ + SimdSize < end + endOffset; simd_i.index_ += SimdSize)
+  index<SimdModel, IndexType> simd_i{IndexType(start)};
+  const auto simdSize = simd_i.size();
+  const auto endOffset = residualLoopPolicy == ScalarResidualLoop ? 1 : simdSize;
+  for (; simd_i.index_ + simdSize < end + endOffset; simd_i.index_ += simdSize)
   {
     if constexpr (sizeof...(Args) == 0)
     {
@@ -76,7 +77,8 @@ inline void loop(std::integral auto start, std::integral auto end, auto&& fn,
  * Linear simd-ized iteration over a function. The function is first called with an integral index until the
  * `alignTestFn` returns true for a specific index. From there on `alignTestFn` isn't called anymore and the function
  * is called with a simd index. The remainder loop is called with an integral index again.
- * @tparam SimdSize Vector size.
+ * @tparam SimdModel Simd type acting as type model.
+ * @tparam Args Optional additional template arguments passed to the function call operator.
  * @param start Start of the iteration range [start, end).
  * @param end End of the iteration range [start, end).
  * @param alignTestFn Generic function to be called. Takes one scalar argument of the common type of `start` and `end`.
@@ -85,11 +87,11 @@ inline void loop(std::integral auto start, std::integral auto end, auto&& fn,
  * @param fn Generic function to be called. Takes one argument, whose type is either `index<SimdSize, IntegralType>`
  *   or `IntegralType`.
  */
-template<int SimdSize, auto ... Args>
+template<class SimdModel, auto ... Args>
 inline void aligning_loop(std::integral auto start, std::integral auto end, auto&& alignTestFn, auto&& fn)
 {
   using IndexType = std::common_type_t<decltype(start), decltype(end)>;
-  index<SimdSize, IndexType> simd_i{IndexType(start)};
+  index<SimdModel, IndexType> simd_i{IndexType(start)};
   for (; simd_i.index_ < end && !alignTestFn(simd_i.index_); ++simd_i.index_)
   {
     if constexpr (sizeof...(Args) == 0)
@@ -101,7 +103,8 @@ inline void aligning_loop(std::integral auto start, std::integral auto end, auto
       fn.template operator()<Args...>(simd_i.index_);
     }
   }
-  for (; simd_i.index_ + SimdSize < end + 1; simd_i.index_ += SimdSize)
+  const auto simdSize = simd_i.size();
+  for (; simd_i.index_ + simdSize < end + 1; simd_i.index_ += simdSize)
   {
     if constexpr (sizeof...(Args) == 0)
     {
@@ -128,7 +131,7 @@ inline void aligning_loop(std::integral auto start, std::integral auto end, auto
 /**
  * Simd-ized iteration over a function using indirect indexing. The function is first called with an stdx::simd
  * and the remainder loop is called with an integral index.
- * @tparam SimdSize Vector size.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam Args Optional additional template arguments passed to the function call operator.
  * @tparam IteratorType Deduced type of the random access iterator defining the range of indices.
  * @param start Inclusive start of the range of indices.
@@ -140,16 +143,18 @@ inline void aligning_loop(std::integral auto start, std::integral auto end, auto
  *   case the user is responsible for the handling of indices possbily extending the valid iteration range. Defaults
  *   to `ScalarResidualLoop`.
  */
-template<int SimdSize, auto ... Args, std::random_access_iterator IteratorType,
+template<class SimdModel, auto ... Args, std::random_access_iterator IteratorType,
   typename ResidualLoopPolicyType = ScalarResidualLoopT>
 inline void loop(IteratorType start, const IteratorType& end, auto&& fn,
   ResidualLoopPolicyType residualLoopPolicy = ScalarResidualLoop)
 {
   size_t i = 0, i_end = end - start;
-  constexpr auto endOffset = residualLoopPolicy == ScalarResidualLoop ? 1 : SimdSize;
-  for (; i + SimdSize < i_end + endOffset; i += SimdSize)
+  using SimdIndexType = stdx::rebind_simd_t<std::decay_t<decltype(*start)>, SimdModel>;
+  const auto simdSize = SimdIndexType::size();
+  const auto endOffset = residualLoopPolicy == ScalarResidualLoop ? 1 : simdSize;
+  for (; i + simdSize < i_end + endOffset; i += simdSize)
   {
-    stdx::fixed_size_simd<std::decay_t<decltype(*start)>, SimdSize> simd_i([&](auto j) { return *(start + i + j); });
+    SimdIndexType simd_i([&](auto j) { return *(start + i + j); });
     if constexpr (sizeof...(Args) == 0)
     {
       fn(simd_i);
@@ -178,7 +183,7 @@ inline void loop(IteratorType start, const IteratorType& end, auto&& fn,
 /**
  * Simd-ized iteration over a function using indirect indexing. The function is first called with an stdx::simd
  * and the remainder loop is called with an integral index.
- * @tparam SimdSize Vector size.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam Args Optional additional template arguments passed to the function call operator.
  * @tparam IteratorType Deduced type of the random access iterator defining the range of indices.
  * @param start Inclusive start of the range of indices.
@@ -191,18 +196,19 @@ inline void loop(IteratorType start, const IteratorType& end, auto&& fn,
  *   case the user is responsible for the handling of indices possbily extending the valid iteration range. Defaults
  *   to `ScalarResidualLoop`.
  */
-template<int SimdSize, auto ... Args, std::random_access_iterator IteratorType,
+template<class SimdModel, auto ... Args, std::random_access_iterator IteratorType,
   typename ResidualLoopPolicyType = ScalarResidualLoopT>
 inline void loop_with_linear_index(IteratorType start, const IteratorType& end, auto&& fn,
   ResidualLoopPolicyType residualLoopPolicy = ScalarResidualLoop)
 {
   size_t i_end = end - start;
-  constexpr auto endOffset = residualLoopPolicy == ScalarResidualLoop ? 1 : SimdSize;
-  index<SimdSize, size_t> i{0};
-  for (; i.index_ + SimdSize < i_end + endOffset; i.index_ += SimdSize)
+  index<SimdModel, size_t> i{0};
+  const auto simdSize = i.size();
+  const auto endOffset = residualLoopPolicy == ScalarResidualLoop ? 1 : simdSize;
+  for (; i.index_ + simdSize < i_end + endOffset; i.index_ += simdSize)
   {
-    stdx::fixed_size_simd<std::decay_t<decltype(*start)>, SimdSize> simd_i([&](auto j)
-      { return *(start + i.index_ + j); });
+    using SimdIndexType = stdx::rebind_simd_t<std::decay_t<decltype(*start)>, SimdModel>;
+    SimdIndexType simd_i([&](auto j) { return *(start + i.index_ + j); });
     if constexpr (sizeof...(Args) == 0)
     {
       fn(i, simd_i);

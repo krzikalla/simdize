@@ -76,7 +76,7 @@ TEST(OperatorOverload, Subscription)
     source[i] = i + 1.0;
   }
 
-  simd_access::loop<stdx::native_simd<double>::size()>(0, array_size,
+  simd_access::loop<stdx::simd<double>>(0, array_size,
     [&](auto i)
     {
       // If 'operator[]' would be globally overloadable, then argument order don't need to be reversed anymore.
@@ -102,7 +102,7 @@ TEST(OperatorOverload, MemberAccess)
     source[i].y = i + 2.0;
   }
 
-  simd_access::loop<stdx::native_simd<double>::size()>(0, array_size,
+  simd_access::loop<stdx::simd<double>>(0, array_size,
     [&](auto i)
     {
       // If 'operator.' would be overloadable (in addition to a global 'operator[]'),
@@ -132,7 +132,7 @@ TEST(OperatorOverload, NamedMemberAccess)
     source[i][nY] = i + 2.0;
   }
 
-  simd_access::loop<stdx::native_simd<double>::size()>(0, array_size,
+  simd_access::loop<stdx::simd<double>>(0, array_size,
     [&](auto i)
     {
       i[destination][nX] = 1.0 / i[source][nX];

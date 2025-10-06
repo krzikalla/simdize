@@ -42,7 +42,7 @@ auto reduce(const simd_access::simd_arithmetic auto& x, auto)
 void Reduce_SimpleSimd(benchmark::State& state)
 {
   auto arraySize = state.range(0);
-  constexpr size_t vec_size = stdx::native_simd<double>::size();
+  using SimdModel = stdx::simd<double>;
   std::vector<double> testData(arraySize);
   GenerateNWithIndex(testData.begin(), arraySize, [](auto i) { return double(i + 1); });
   HeatCache(testData);
@@ -50,7 +50,7 @@ void Reduce_SimpleSimd(benchmark::State& state)
   for (auto _ : state)
   {
     double result = .0;
-    simd_access::loop<vec_size>(0, testData.size(), [&](auto i)
+    simd_access::loop<SimdModel>(0, testData.size(), [&](auto i)
     {
       using stdx::reduce;
       using my_reduce::reduce;
@@ -65,7 +65,7 @@ void Reduce_SimpleSimd(benchmark::State& state)
 void Reduce_SophisticatedSimd(benchmark::State& state)
 {
   auto arraySize = state.range(0);
-  constexpr size_t vec_size = stdx::native_simd<double>::size();
+  using SimdModel = stdx::simd<double>;
   std::vector<double> testData(arraySize);
   GenerateNWithIndex(testData.begin(), arraySize, [](auto i) { return double(i + 1); });
   HeatCache(testData);
@@ -73,8 +73,8 @@ void Reduce_SophisticatedSimd(benchmark::State& state)
   for (auto _ : state)
   {
     auto p = testData.data();
-    stdx::fixed_size_simd<double, vec_size> intermediateResult(.0);
-    simd_access::loop<vec_size>(0, testData.size(), [&](auto i)
+    SimdModel intermediateResult(.0);
+    simd_access::loop<SimdModel>(0, testData.size(), [&](auto i)
     {
       if constexpr (simd_access::is_simd_index(i))
       {

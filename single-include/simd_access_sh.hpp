@@ -42,7 +42,7 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
@@ -127,7 +127,7 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
@@ -215,7 +215,7 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
@@ -428,13 +428,13 @@ inline auto scalar_index(const index<SimdSize, IndexType>& idx, auto i)
 /// Returns the scalar index of a specific vector lane for an indirect index u.
 /**
  * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam Abi Deduced abi of the `simd` paramter.
+ * @tparam SimdModel Deduced abi of the `simd` paramter.
  * @param idx Indirect simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
  */
-template<std::integral IndexType, class Abi>
-inline auto scalar_index(const stdx::simd<IndexType, Abi>& idx, auto i)
+template<std::integral IndexType, class SimdModel>
+inline auto scalar_index(const stdx::simd<IndexType, SimdModel>& idx, auto i)
 {
   return idx[i];
 }
@@ -442,7 +442,7 @@ inline auto scalar_index(const stdx::simd<IndexType, Abi>& idx, auto i)
 /// Returns true, if the argument is a simd index (i.e. fullfills the concept `simd_index`).
 /**
  * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam Abi Deduced abi of the `simd` paramter.
+ * @tparam SimdModel Deduced abi of the `simd` paramter.
  * @param idx Indirect simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
@@ -508,7 +508,7 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
@@ -690,7 +690,7 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
@@ -903,13 +903,13 @@ inline auto scalar_index(const index<SimdSize, IndexType>& idx, auto i)
 /// Returns the scalar index of a specific vector lane for an indirect index u.
 /**
  * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam Abi Deduced abi of the `simd` paramter.
+ * @tparam SimdModel Deduced abi of the `simd` paramter.
  * @param idx Indirect simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
  */
-template<std::integral IndexType, class Abi>
-inline auto scalar_index(const stdx::simd<IndexType, Abi>& idx, auto i)
+template<std::integral IndexType, class SimdModel>
+inline auto scalar_index(const stdx::simd<IndexType, SimdModel>& idx, auto i)
 {
   return idx[i];
 }
@@ -917,7 +917,7 @@ inline auto scalar_index(const stdx::simd<IndexType, Abi>& idx, auto i)
 /// Returns true, if the argument is a simd index (i.e. fullfills the concept `simd_index`).
 /**
  * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam Abi Deduced abi of the `simd` paramter.
+ * @tparam SimdModel Deduced abi of the `simd` paramter.
  * @param idx Indirect simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
@@ -1316,7 +1316,7 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
@@ -1404,7 +1404,7 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
@@ -1617,13 +1617,13 @@ inline auto scalar_index(const index<SimdSize, IndexType>& idx, auto i)
 /// Returns the scalar index of a specific vector lane for an indirect index u.
 /**
  * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam Abi Deduced abi of the `simd` paramter.
+ * @tparam SimdModel Deduced abi of the `simd` paramter.
  * @param idx Indirect simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
  */
-template<std::integral IndexType, class Abi>
-inline auto scalar_index(const stdx::simd<IndexType, Abi>& idx, auto i)
+template<std::integral IndexType, class SimdModel>
+inline auto scalar_index(const stdx::simd<IndexType, SimdModel>& idx, auto i)
 {
   return idx[i];
 }
@@ -1631,7 +1631,7 @@ inline auto scalar_index(const stdx::simd<IndexType, Abi>& idx, auto i)
 /// Returns true, if the argument is a simd index (i.e. fullfills the concept `simd_index`).
 /**
  * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam Abi Deduced abi of the `simd` paramter.
+ * @tparam SimdModel Deduced abi of the `simd` paramter.
  * @param idx Indirect simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
@@ -1847,7 +1847,7 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
@@ -2060,13 +2060,13 @@ inline auto scalar_index(const index<SimdSize, IndexType>& idx, auto i)
 /// Returns the scalar index of a specific vector lane for an indirect index u.
 /**
  * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam Abi Deduced abi of the `simd` paramter.
+ * @tparam SimdModel Deduced abi of the `simd` paramter.
  * @param idx Indirect simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
  */
-template<std::integral IndexType, class Abi>
-inline auto scalar_index(const stdx::simd<IndexType, Abi>& idx, auto i)
+template<std::integral IndexType, class SimdModel>
+inline auto scalar_index(const stdx::simd<IndexType, SimdModel>& idx, auto i)
 {
   return idx[i];
 }
@@ -2074,7 +2074,7 @@ inline auto scalar_index(const stdx::simd<IndexType, Abi>& idx, auto i)
 /// Returns true, if the argument is a simd index (i.e. fullfills the concept `simd_index`).
 /**
  * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam Abi Deduced abi of the `simd` paramter.
+ * @tparam SimdModel Deduced abi of the `simd` paramter.
  * @param idx Indirect simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
@@ -2130,7 +2130,7 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
@@ -2312,7 +2312,7 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
@@ -2525,13 +2525,13 @@ inline auto scalar_index(const index<SimdSize, IndexType>& idx, auto i)
 /// Returns the scalar index of a specific vector lane for an indirect index u.
 /**
  * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam Abi Deduced abi of the `simd` paramter.
+ * @tparam SimdModel Deduced abi of the `simd` paramter.
  * @param idx Indirect simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
  */
-template<std::integral IndexType, class Abi>
-inline auto scalar_index(const stdx::simd<IndexType, Abi>& idx, auto i)
+template<std::integral IndexType, class SimdModel>
+inline auto scalar_index(const stdx::simd<IndexType, SimdModel>& idx, auto i)
 {
   return idx[i];
 }
@@ -2539,7 +2539,7 @@ inline auto scalar_index(const stdx::simd<IndexType, Abi>& idx, auto i)
 /// Returns true, if the argument is a simd index (i.e. fullfills the concept `simd_index`).
 /**
  * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam Abi Deduced abi of the `simd` paramter.
+ * @tparam SimdModel Deduced abi of the `simd` paramter.
  * @param idx Indirect simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
@@ -2746,7 +2746,7 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
@@ -2959,13 +2959,13 @@ inline auto scalar_index(const index<SimdSize, IndexType>& idx, auto i)
 /// Returns the scalar index of a specific vector lane for an indirect index u.
 /**
  * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam Abi Deduced abi of the `simd` paramter.
+ * @tparam SimdModel Deduced abi of the `simd` paramter.
  * @param idx Indirect simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
  */
-template<std::integral IndexType, class Abi>
-inline auto scalar_index(const stdx::simd<IndexType, Abi>& idx, auto i)
+template<std::integral IndexType, class SimdModel>
+inline auto scalar_index(const stdx::simd<IndexType, SimdModel>& idx, auto i)
 {
   return idx[i];
 }
@@ -2973,7 +2973,7 @@ inline auto scalar_index(const stdx::simd<IndexType, Abi>& idx, auto i)
 /// Returns true, if the argument is a simd index (i.e. fullfills the concept `simd_index`).
 /**
  * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam Abi Deduced abi of the `simd` paramter.
+ * @tparam SimdModel Deduced abi of the `simd` paramter.
  * @param idx Indirect simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
@@ -3258,7 +3258,7 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
@@ -3440,7 +3440,7 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
@@ -3653,13 +3653,13 @@ inline auto scalar_index(const index<SimdSize, IndexType>& idx, auto i)
 /// Returns the scalar index of a specific vector lane for an indirect index u.
 /**
  * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam Abi Deduced abi of the `simd` paramter.
+ * @tparam SimdModel Deduced abi of the `simd` paramter.
  * @param idx Indirect simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
  */
-template<std::integral IndexType, class Abi>
-inline auto scalar_index(const stdx::simd<IndexType, Abi>& idx, auto i)
+template<std::integral IndexType, class SimdModel>
+inline auto scalar_index(const stdx::simd<IndexType, SimdModel>& idx, auto i)
 {
   return idx[i];
 }
@@ -3667,7 +3667,7 @@ inline auto scalar_index(const stdx::simd<IndexType, Abi>& idx, auto i)
 /// Returns true, if the argument is a simd index (i.e. fullfills the concept `simd_index`).
 /**
  * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam Abi Deduced abi of the `simd` paramter.
+ * @tparam SimdModel Deduced abi of the `simd` paramter.
  * @param idx Indirect simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
@@ -3999,7 +3999,7 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
@@ -4087,7 +4087,7 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
@@ -4300,13 +4300,13 @@ inline auto scalar_index(const index<SimdSize, IndexType>& idx, auto i)
 /// Returns the scalar index of a specific vector lane for an indirect index u.
 /**
  * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam Abi Deduced abi of the `simd` paramter.
+ * @tparam SimdModel Deduced abi of the `simd` paramter.
  * @param idx Indirect simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
  */
-template<std::integral IndexType, class Abi>
-inline auto scalar_index(const stdx::simd<IndexType, Abi>& idx, auto i)
+template<std::integral IndexType, class SimdModel>
+inline auto scalar_index(const stdx::simd<IndexType, SimdModel>& idx, auto i)
 {
   return idx[i];
 }
@@ -4314,7 +4314,7 @@ inline auto scalar_index(const stdx::simd<IndexType, Abi>& idx, auto i)
 /// Returns true, if the argument is a simd index (i.e. fullfills the concept `simd_index`).
 /**
  * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam Abi Deduced abi of the `simd` paramter.
+ * @tparam SimdModel Deduced abi of the `simd` paramter.
  * @param idx Indirect simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
@@ -4380,7 +4380,7 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
@@ -4562,7 +4562,7 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
@@ -4775,13 +4775,13 @@ inline auto scalar_index(const index<SimdSize, IndexType>& idx, auto i)
 /// Returns the scalar index of a specific vector lane for an indirect index u.
 /**
  * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam Abi Deduced abi of the `simd` paramter.
+ * @tparam SimdModel Deduced abi of the `simd` paramter.
  * @param idx Indirect simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
  */
-template<std::integral IndexType, class Abi>
-inline auto scalar_index(const stdx::simd<IndexType, Abi>& idx, auto i)
+template<std::integral IndexType, class SimdModel>
+inline auto scalar_index(const stdx::simd<IndexType, SimdModel>& idx, auto i)
 {
   return idx[i];
 }
@@ -4789,7 +4789,7 @@ inline auto scalar_index(const stdx::simd<IndexType, Abi>& idx, auto i)
 /// Returns true, if the argument is a simd index (i.e. fullfills the concept `simd_index`).
 /**
  * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam Abi Deduced abi of the `simd` paramter.
+ * @tparam SimdModel Deduced abi of the `simd` paramter.
  * @param idx Indirect simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
@@ -5256,7 +5256,7 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
@@ -5410,7 +5410,7 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
@@ -5592,7 +5592,7 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
@@ -5805,13 +5805,13 @@ inline auto scalar_index(const index<SimdSize, IndexType>& idx, auto i)
 /// Returns the scalar index of a specific vector lane for an indirect index u.
 /**
  * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam Abi Deduced abi of the `simd` paramter.
+ * @tparam SimdModel Deduced abi of the `simd` paramter.
  * @param idx Indirect simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
  */
-template<std::integral IndexType, class Abi>
-inline auto scalar_index(const stdx::simd<IndexType, Abi>& idx, auto i)
+template<std::integral IndexType, class SimdModel>
+inline auto scalar_index(const stdx::simd<IndexType, SimdModel>& idx, auto i)
 {
   return idx[i];
 }
@@ -5819,7 +5819,7 @@ inline auto scalar_index(const stdx::simd<IndexType, Abi>& idx, auto i)
 /// Returns true, if the argument is a simd index (i.e. fullfills the concept `simd_index`).
 /**
  * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam Abi Deduced abi of the `simd` paramter.
+ * @tparam SimdModel Deduced abi of the `simd` paramter.
  * @param idx Indirect simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
@@ -6156,12 +6156,12 @@ struct LValueSeparator<true>
   /// Computes the base address of a given array for an indirect simd access using indices in `stdx::simd`.
   /**
    * @tparam IndexType Deduced integral type of the scalar index.
-   * @tparam Abi Deduced abi of the `simd` paramter.
+   * @tparam SimdModel Deduced abi of the `simd` paramter.
    * @param base_addr Array base.
    * @return The address of the first array element.
    */
-  template<std::integral IndexType, class Abi>
-  static auto get_base_address(auto&& base_addr, const stdx::simd<IndexType, Abi>&)
+  template<std::integral IndexType, class SimdModel>
+  static auto get_base_address(auto&& base_addr, const stdx::simd<IndexType, SimdModel>&)
   {
     return &base_addr[0];
   }
@@ -6184,13 +6184,13 @@ struct LValueSeparator<true>
   /// Computes the base address of a member of array elements for an indirect simd access using indices in `stdx::simd`.
   /**
    * @tparam IndexType Deduced integral type of the scalar index.
-   * @tparam Abi Deduced abi of the `simd` paramter.
+   * @tparam SimdModel Deduced abi of the `simd` paramter.
    * @param base_addr Array base.
    * @param subobject A functor yielding a member of the array element.
    * @return The address of the member of the first array element.
    */
-  template<std::integral IndexType, class Abi>
-  static auto get_base_address(auto&& base_addr, const stdx::simd<IndexType, Abi>&, auto&& subobject)
+  template<std::integral IndexType, class SimdModel>
+  static auto get_base_address(auto&& base_addr, const stdx::simd<IndexType, SimdModel>&, auto&& subobject)
   {
     return &subobject(base_addr[0]);
   }
@@ -6215,15 +6215,15 @@ struct LValueSeparator<true>
    * @tparam ElementSize Size of an array element.
    * @tparam T Deduced type of the simd-accessed element.
    * @tparam IndexType Deduced integral type of the scalar index.
-   * @tparam Abi Deduced abi of the `simd` paramter.
+   * @tparam SimdModel Deduced abi of the `simd` paramter.
    * @param base Pointer to the first array element or one of its members.
    * @param idx SIMD index.
    * @return A value access object (see \ref value_access), which can be used as lhs in assignments.
    */
-  template<size_t ElementSize, class T, std::integral IndexType, class Abi>
-  static auto get_direct_value_access(T* base, const stdx::simd<IndexType, Abi>& idx)
+  template<size_t ElementSize, class T, std::integral IndexType, class SimdModel>
+  static auto get_direct_value_access(T* base, const stdx::simd<IndexType, SimdModel>& idx)
   {
-    using location_type = indexed_location<T, stdx::simd<IndexType, Abi>::size(), stdx::simd<IndexType, Abi>>;
+    using location_type = indexed_location<T, stdx::simd<IndexType, SimdModel>::size(), stdx::simd<IndexType, SimdModel>>;
     return make_value_access<ElementSize>(location_type{base, idx});
   }
 

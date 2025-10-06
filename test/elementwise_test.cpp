@@ -93,7 +93,8 @@ TEST(Elementwise, SingleElementAccess)
 
 TEST(Elementwise, SingleElementAccessUniversalSimd)
 {
-  simd_access::auto_simd_t<std::string, 3> custom_simd;
+  using SimdModel = stdx::fixed_size_simd<double, 4>;
+  simd_access::auto_simd_t<std::string, SimdModel> custom_simd;
   custom_simd[0] = "Hi";
 
   EXPECT_EQ(simd_access::get_element<0>(custom_simd), "Hi");

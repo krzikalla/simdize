@@ -30,7 +30,7 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =

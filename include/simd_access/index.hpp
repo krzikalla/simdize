@@ -35,7 +35,7 @@ struct index
   /**
    * @return The length of the simd sequence.
    */
-  static int size() { return SimdModel::size(); }
+  static auto size() { return SimdModel::size(); }
 
   /// Return the scalar index of a vector lane.
   /**

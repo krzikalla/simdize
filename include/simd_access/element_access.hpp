@@ -24,7 +24,7 @@ concept simd_accessible = simd_index<T> || any_simd<T>;
  * @param i Index in the simd index.
  * @return The index at the i'th position of `index`.
  */
-inline auto element(const simd_index auto& index, int i)
+inline auto element(const simd_index auto& index, size_t i)
 {
   return scalar_index(index, i);
 }
@@ -35,7 +35,7 @@ inline auto element(const simd_index auto& index, int i)
  * @param i Index in the simd value.
  * @return The scalar value at the i'th position of `value`.
  */
-inline decltype(auto) element(any_simd auto&& value, int i)
+inline decltype(auto) element(any_simd auto&& value, size_t i)
 {
   return value[i];
 }
@@ -59,7 +59,7 @@ inline auto&& element(auto&& value)
  */
 inline void elementwise(auto&& fn, simd_accessible auto&& x, simd_accessible auto&&... y)
 {
-  for (int i = 0; i < x.size(); ++i)
+  for (size_t i = 0; i < x.size(); ++i)
   {
     fn(element(x, i), element(y, i)...);
   }
@@ -75,7 +75,7 @@ inline void elementwise(auto&& fn, simd_accessible auto&& x, simd_accessible aut
  */
 inline void elementwise_with_index(auto&& fn, simd_accessible auto&& x, simd_accessible auto&&... y)
 {
-  for (int i = 0; i < x.size(); ++i)
+  for (size_t i = 0; i < x.size(); ++i)
   {
     fn(element(x, i), element(y, i)..., i);
   }

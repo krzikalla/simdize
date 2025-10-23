@@ -28,7 +28,7 @@ namespace simd_access
 {
 
 /// Forward declaration
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct universal_simd;
 
 template<typename T>
@@ -42,44 +42,45 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
   stdx_simd<PotentialSimdType> ||
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, int SimdSize>(universal_simd<T, SimdSize>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x)
+    { []<class T, class SimdModel>(universal_simd<T, SimdModel>&){}(x); };
 
 /// Helper class to auto-generate either a `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct auto_simd
 {
   /// Universal simd type.
-  using type = universal_simd<T, SimdSize>;
+  using type = universal_simd<T, SimdModel>;
 };
 
 /// Specialization of \ref auto_simd for the `stdx::simd` variant,
 /**
  * @tparam T Arithmetic value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<simd_arithmetic T, int SimdSize>
-struct auto_simd<T, SimdSize>
+template<simd_arithmetic T, class SimdModel>
+struct auto_simd<T, SimdModel>
 {
   /// stdx::simd type.
-  using type = stdx::fixed_size_simd<T, SimdSize>;
+  using type = stdx::rebind_simd_t<T, SimdModel>;
 };
 
 /// Type which resolves either to `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type. If arithmetic, the resulting type is a `stdx::simd`. Otherwise it is a `universal_simd`.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
-using auto_simd_t = typename auto_simd<T, SimdSize>::type;
+template<class T, class SimdModel>
+using auto_simd_t = typename auto_simd<T, SimdModel>::type;
 
 } //namespace simd_access
 
@@ -113,7 +114,7 @@ namespace simd_access
 {
 
 /// Forward declaration
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct universal_simd;
 
 template<typename T>
@@ -127,44 +128,45 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
   stdx_simd<PotentialSimdType> ||
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, int SimdSize>(universal_simd<T, SimdSize>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x)
+    { []<class T, class SimdModel>(universal_simd<T, SimdModel>&){}(x); };
 
 /// Helper class to auto-generate either a `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct auto_simd
 {
   /// Universal simd type.
-  using type = universal_simd<T, SimdSize>;
+  using type = universal_simd<T, SimdModel>;
 };
 
 /// Specialization of \ref auto_simd for the `stdx::simd` variant,
 /**
  * @tparam T Arithmetic value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<simd_arithmetic T, int SimdSize>
-struct auto_simd<T, SimdSize>
+template<simd_arithmetic T, class SimdModel>
+struct auto_simd<T, SimdModel>
 {
   /// stdx::simd type.
-  using type = stdx::fixed_size_simd<T, SimdSize>;
+  using type = stdx::rebind_simd_t<T, SimdModel>;
 };
 
 /// Type which resolves either to `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type. If arithmetic, the resulting type is a `stdx::simd`. Otherwise it is a `universal_simd`.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
-using auto_simd_t = typename auto_simd<T, SimdSize>::type;
+template<class T, class SimdModel>
+using auto_simd_t = typename auto_simd<T, SimdModel>::type;
 
 } //namespace simd_access
 
@@ -201,7 +203,7 @@ namespace simd_access
 {
 
 /// Forward declaration
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct universal_simd;
 
 template<typename T>
@@ -215,44 +217,45 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
   stdx_simd<PotentialSimdType> ||
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, int SimdSize>(universal_simd<T, SimdSize>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x)
+    { []<class T, class SimdModel>(universal_simd<T, SimdModel>&){}(x); };
 
 /// Helper class to auto-generate either a `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct auto_simd
 {
   /// Universal simd type.
-  using type = universal_simd<T, SimdSize>;
+  using type = universal_simd<T, SimdModel>;
 };
 
 /// Specialization of \ref auto_simd for the `stdx::simd` variant,
 /**
  * @tparam T Arithmetic value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<simd_arithmetic T, int SimdSize>
-struct auto_simd<T, SimdSize>
+template<simd_arithmetic T, class SimdModel>
+struct auto_simd<T, SimdModel>
 {
   /// stdx::simd type.
-  using type = stdx::fixed_size_simd<T, SimdSize>;
+  using type = stdx::rebind_simd_t<T, SimdModel>;
 };
 
 /// Type which resolves either to `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type. If arithmetic, the resulting type is a `stdx::simd`. Otherwise it is a `universal_simd`.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
-using auto_simd_t = typename auto_simd<T, SimdSize>::type;
+template<class T, class SimdModel>
+using auto_simd_t = typename auto_simd<T, SimdModel>::type;
 
 } //namespace simd_access
 
@@ -276,13 +279,15 @@ namespace simd_access
 /// Specifies a location for a simd variable stored in memory as a consecutive sequence of elements.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct linear_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to the first element of the sequence.
   T* base_;
 
@@ -294,7 +299,7 @@ struct linear_location
   template<auto Member>
   auto member_access() const
   {
-    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize>{&(base_->*Member)};
+    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel>{&(base_->*Member)};
   }
 
   /// Creation of a linear location for an element of `T`, if `T` is an array.
@@ -304,21 +309,23 @@ struct linear_location
    */
   auto array_access(auto i) const
   {
-    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize>{&((*base_)[i])};
+    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel>{&((*base_)[i])};
   }
 };
 
 /// Specifies a location for a simd variable with the indices of its values stored in an array.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ArrayType Type of the array, which stores the indices.
  */
-template<class T, int SimdSize, class ArrayType>
+template<class T, class SimdModel, class ArrayType>
 struct indexed_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to element zero of the sequence.
   T* base_;
   /// Reference to the index array.
@@ -332,7 +339,7 @@ struct indexed_location
   template<auto Member>
   auto member_access() const
   {
-    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel, ArrayType>
       {&(base_->*Member), indices_};
   }
 
@@ -343,7 +350,7 @@ struct indexed_location
    */
   auto array_access(auto i) const
   {
-    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel, ArrayType>
       {&((*base_)[i]), indices_};
   }
 };
@@ -360,24 +367,27 @@ class value_access;
 
 /// Class representing a simd index to a consecutive sequence of elements.
 /**
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam IndexType Type of the scalar index.
  */
-template<int SimdSize, class IndexType = size_t>
+template<class SimdModel, class IndexType = size_t>
 struct index
 {
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
+
   /// Return the length of the simd sequence.
   /**
    * @return The length of the simd sequence.
    */
-  static constexpr int size() { return SimdSize; }
+  static auto size() { return SimdModel::size(); }
 
   /// Return the scalar index of a vector lane.
   /**
    * @param i Index in the vector must be in the range [0, SimdSize) .
    * @return The scalar index at vector lane i, i.e. index_ + i.
    */
-  auto scalar_index(int i) const { return index_ + IndexType(i); }
+  auto scalar_index(auto i) const { return index_ + IndexType(i); }
 
   /// The index, at which the sequence starts.
   IndexType index_;
@@ -391,7 +401,7 @@ struct index
   template<class T>
   auto operator[](T* data) const
   {
-    return value_access<linear_location<T, SimdSize>, sizeof(T)>(linear_location<T, SimdSize>{data + index_});
+    return value_access<linear_location<T, SimdModel>, sizeof(T)>(linear_location<T, SimdModel>{data + index_});
   }
 
   /// Transforms this to a simd value.
@@ -400,27 +410,27 @@ struct index
    */
   auto to_simd() const
   {
-    return stdx::fixed_size_simd<IndexType, SimdSize>([this](auto i){ return IndexType(index_ + i); });
+    return stdx::rebind_simd_t<IndexType, SimdModel>([this](auto i){ return IndexType(index_ + i); });
   }
 };
 
 template<class PotentialIndexType>
 concept simd_index =
   (stdx_simd<PotentialIndexType> && std::is_integral_v<typename PotentialIndexType::value_type>) ||
-  requires(std::remove_cvref_t<PotentialIndexType> x) { []<int SimdSize, class IndexType>(index<SimdSize, IndexType>&){}(x); };
+  requires(std::remove_cvref_t<PotentialIndexType> x) { []<class SimdModel, class IndexType>(index<SimdModel, IndexType>&){}(x); };
 
 /// TODO: Introduce masked_index to support e.g. residual masked loops.
 
 /// Returns the scalar index of a specific vector lane for a linear index.
 /**
- * @tparam SimdSize Deduced simd size.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam IndexType Deduced type of the scalar index.
  * @param idx Linear simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx.start + i`.
  */
-template<int SimdSize, class IndexType>
-inline auto scalar_index(const index<SimdSize, IndexType>& idx, auto i)
+template<class SimdModel, class IndexType>
+inline auto scalar_index(const index<SimdModel, IndexType>& idx, auto i)
 {
   return idx.scalar_index(i);
 }
@@ -441,16 +451,31 @@ inline auto scalar_index(const stdx::simd<IndexType, SimdModel>& idx, auto i)
 
 /// Returns true, if the argument is a simd index (i.e. fullfills the concept `simd_index`).
 /**
- * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam SimdModel Deduced abi of the `simd` paramter.
- * @param idx Indirect simd index.
- * @param i Vector lane.
- * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
+ * @param idx Potential simd index.
+ * @return True, if the type of idx fulfills `simd_index` concept.
  */
- constexpr inline auto is_simd_index(auto&& idx)
+constexpr inline auto is_simd_index(auto&& idx)
 {
   return simd_index<decltype(idx)>;
 }
+
+template<class T>
+struct index_model;
+
+template<class SimdModel, class IndexType>
+struct index_model<index<SimdModel, IndexType>>
+{
+  using type = SimdModel;
+};
+
+template<std::integral Index, class Abi>
+struct index_model<stdx::simd<Index, Abi>>
+{
+  using type = stdx::simd<Index, Abi>;
+};
+
+template<simd_index T>
+using index_model_t = typename index_model<T>::type;
 
 } //namespace simd_access
 
@@ -494,7 +519,7 @@ namespace simd_access
 {
 
 /// Forward declaration
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct universal_simd;
 
 template<typename T>
@@ -508,44 +533,45 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
   stdx_simd<PotentialSimdType> ||
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, int SimdSize>(universal_simd<T, SimdSize>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x)
+    { []<class T, class SimdModel>(universal_simd<T, SimdModel>&){}(x); };
 
 /// Helper class to auto-generate either a `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct auto_simd
 {
   /// Universal simd type.
-  using type = universal_simd<T, SimdSize>;
+  using type = universal_simd<T, SimdModel>;
 };
 
 /// Specialization of \ref auto_simd for the `stdx::simd` variant,
 /**
  * @tparam T Arithmetic value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<simd_arithmetic T, int SimdSize>
-struct auto_simd<T, SimdSize>
+template<simd_arithmetic T, class SimdModel>
+struct auto_simd<T, SimdModel>
 {
   /// stdx::simd type.
-  using type = stdx::fixed_size_simd<T, SimdSize>;
+  using type = stdx::rebind_simd_t<T, SimdModel>;
 };
 
 /// Type which resolves either to `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type. If arithmetic, the resulting type is a `stdx::simd`. Otherwise it is a `universal_simd`.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
-using auto_simd_t = typename auto_simd<T, SimdSize>::type;
+template<class T, class SimdModel>
+using auto_simd_t = typename auto_simd<T, SimdModel>::type;
 
 } //namespace simd_access
 
@@ -569,13 +595,15 @@ namespace simd_access
 /// Specifies a location for a simd variable stored in memory as a consecutive sequence of elements.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct linear_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to the first element of the sequence.
   T* base_;
 
@@ -587,7 +615,7 @@ struct linear_location
   template<auto Member>
   auto member_access() const
   {
-    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize>{&(base_->*Member)};
+    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel>{&(base_->*Member)};
   }
 
   /// Creation of a linear location for an element of `T`, if `T` is an array.
@@ -597,21 +625,23 @@ struct linear_location
    */
   auto array_access(auto i) const
   {
-    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize>{&((*base_)[i])};
+    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel>{&((*base_)[i])};
   }
 };
 
 /// Specifies a location for a simd variable with the indices of its values stored in an array.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ArrayType Type of the array, which stores the indices.
  */
-template<class T, int SimdSize, class ArrayType>
+template<class T, class SimdModel, class ArrayType>
 struct indexed_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to element zero of the sequence.
   T* base_;
   /// Reference to the index array.
@@ -625,7 +655,7 @@ struct indexed_location
   template<auto Member>
   auto member_access() const
   {
-    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel, ArrayType>
       {&(base_->*Member), indices_};
   }
 
@@ -636,7 +666,7 @@ struct indexed_location
    */
   auto array_access(auto i) const
   {
-    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel, ArrayType>
       {&((*base_)[i]), indices_};
   }
 };
@@ -676,7 +706,7 @@ namespace simd_access
 {
 
 /// Forward declaration
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct universal_simd;
 
 template<typename T>
@@ -690,44 +720,45 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
   stdx_simd<PotentialSimdType> ||
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, int SimdSize>(universal_simd<T, SimdSize>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x)
+    { []<class T, class SimdModel>(universal_simd<T, SimdModel>&){}(x); };
 
 /// Helper class to auto-generate either a `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct auto_simd
 {
   /// Universal simd type.
-  using type = universal_simd<T, SimdSize>;
+  using type = universal_simd<T, SimdModel>;
 };
 
 /// Specialization of \ref auto_simd for the `stdx::simd` variant,
 /**
  * @tparam T Arithmetic value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<simd_arithmetic T, int SimdSize>
-struct auto_simd<T, SimdSize>
+template<simd_arithmetic T, class SimdModel>
+struct auto_simd<T, SimdModel>
 {
   /// stdx::simd type.
-  using type = stdx::fixed_size_simd<T, SimdSize>;
+  using type = stdx::rebind_simd_t<T, SimdModel>;
 };
 
 /// Type which resolves either to `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type. If arithmetic, the resulting type is a `stdx::simd`. Otherwise it is a `universal_simd`.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
-using auto_simd_t = typename auto_simd<T, SimdSize>::type;
+template<class T, class SimdModel>
+using auto_simd_t = typename auto_simd<T, SimdModel>::type;
 
 } //namespace simd_access
 
@@ -751,13 +782,15 @@ namespace simd_access
 /// Specifies a location for a simd variable stored in memory as a consecutive sequence of elements.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct linear_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to the first element of the sequence.
   T* base_;
 
@@ -769,7 +802,7 @@ struct linear_location
   template<auto Member>
   auto member_access() const
   {
-    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize>{&(base_->*Member)};
+    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel>{&(base_->*Member)};
   }
 
   /// Creation of a linear location for an element of `T`, if `T` is an array.
@@ -779,21 +812,23 @@ struct linear_location
    */
   auto array_access(auto i) const
   {
-    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize>{&((*base_)[i])};
+    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel>{&((*base_)[i])};
   }
 };
 
 /// Specifies a location for a simd variable with the indices of its values stored in an array.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ArrayType Type of the array, which stores the indices.
  */
-template<class T, int SimdSize, class ArrayType>
+template<class T, class SimdModel, class ArrayType>
 struct indexed_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to element zero of the sequence.
   T* base_;
   /// Reference to the index array.
@@ -807,7 +842,7 @@ struct indexed_location
   template<auto Member>
   auto member_access() const
   {
-    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel, ArrayType>
       {&(base_->*Member), indices_};
   }
 
@@ -818,7 +853,7 @@ struct indexed_location
    */
   auto array_access(auto i) const
   {
-    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel, ArrayType>
       {&((*base_)[i]), indices_};
   }
 };
@@ -835,17 +870,20 @@ class value_access;
 
 /// Class representing a simd index to a consecutive sequence of elements.
 /**
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam IndexType Type of the scalar index.
  */
-template<int SimdSize, class IndexType = size_t>
+template<class SimdModel, class IndexType = size_t>
 struct index
 {
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
+
   /// Return the length of the simd sequence.
   /**
    * @return The length of the simd sequence.
    */
-  static constexpr int size() { return SimdSize; }
+  static auto size() { return SimdModel::size(); }
 
   /// Return the scalar index of a vector lane.
   /**
@@ -866,7 +904,7 @@ struct index
   template<class T>
   auto operator[](T* data) const
   {
-    return value_access<linear_location<T, SimdSize>, sizeof(T)>(linear_location<T, SimdSize>{data + index_});
+    return value_access<linear_location<T, SimdModel>, sizeof(T)>(linear_location<T, SimdModel>{data + index_});
   }
 
   /// Transforms this to a simd value.
@@ -875,27 +913,27 @@ struct index
    */
   auto to_simd() const
   {
-    return stdx::fixed_size_simd<IndexType, SimdSize>([this](auto i){ return IndexType(index_ + i); });
+    return stdx::rebind_simd_t<IndexType, SimdModel>([this](auto i){ return IndexType(index_ + i); });
   }
 };
 
 template<class PotentialIndexType>
 concept simd_index =
   (stdx_simd<PotentialIndexType> && std::is_integral_v<typename PotentialIndexType::value_type>) ||
-  requires(std::remove_cvref_t<PotentialIndexType> x) { []<int SimdSize, class IndexType>(index<SimdSize, IndexType>&){}(x); };
+  requires(std::remove_cvref_t<PotentialIndexType> x) { []<class SimdModel, class IndexType>(index<SimdModel, IndexType>&){}(x); };
 
 /// TODO: Introduce masked_index to support e.g. residual masked loops.
 
 /// Returns the scalar index of a specific vector lane for a linear index.
 /**
- * @tparam SimdSize Deduced simd size.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam IndexType Deduced type of the scalar index.
  * @param idx Linear simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx.start + i`.
  */
-template<int SimdSize, class IndexType>
-inline auto scalar_index(const index<SimdSize, IndexType>& idx, auto i)
+template<class SimdModel, class IndexType>
+inline auto scalar_index(const index<SimdModel, IndexType>& idx, auto i)
 {
   return idx.scalar_index(i);
 }
@@ -916,16 +954,31 @@ inline auto scalar_index(const stdx::simd<IndexType, SimdModel>& idx, auto i)
 
 /// Returns true, if the argument is a simd index (i.e. fullfills the concept `simd_index`).
 /**
- * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam SimdModel Deduced abi of the `simd` paramter.
- * @param idx Indirect simd index.
- * @param i Vector lane.
- * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
+ * @param idx Potential simd index.
+ * @return True, if the type of idx fulfills `simd_index` concept.
  */
- constexpr inline auto is_simd_index(auto&& idx)
+constexpr inline auto is_simd_index(auto&& idx)
 {
   return simd_index<decltype(idx)>;
 }
+
+template<class T>
+struct index_model;
+
+template<class SimdModel, class IndexType>
+struct index_model<index<SimdModel, IndexType>>
+{
+  using type = SimdModel;
+};
+
+template<std::integral Index, class Abi>
+struct index_model<stdx::simd<Index, Abi>>
+{
+  using type = stdx::simd<Index, Abi>;
+};
+
+template<simd_index T>
+using index_model_t = typename index_model<T>::type;
 
 } //namespace simd_access
 
@@ -962,17 +1015,17 @@ inline void simd_members(FN&& func, typename SrcType::value_type& d, const SrcTy
   func(d, s);
 }
 
-template<int SimdSize, simd_arithmetic T>
+template<class SimdModel, simd_arithmetic T>
 inline auto simdized_value(T)
 {
-  return stdx::fixed_size_simd<T, SimdSize>();
+  return stdx::rebind_simd_t<T, SimdModel>();
 }
 
 // overloads for std types, which can't be added after the template definition, since ADL wouldn't found it
-template<int SimdSize, class T>
+template<class SimdModel, class T>
 inline auto simdized_value(const std::vector<T>& v)
 {
-  std::vector<decltype(simdized_value<SimdSize>(std::declval<T>()))> result(v.size());
+  std::vector<decltype(simdized_value<SimdModel>(std::declval<T>()))> result(v.size());
   return result;
 }
 
@@ -986,10 +1039,10 @@ inline void simd_members(auto&& func, Args&&... values)
   }
 }
 
-template<int SimdSize, class T, class U>
+template<class SimdModel, class T, class U>
 inline auto simdized_value(const std::pair<T, U>& v)
 {
-  return std::make_pair(simdized_value<SimdSize>(v.first), simdized_value<SimdSize>(v.second));
+  return std::make_pair(simdized_value<SimdModel>(v.first), simdized_value<SimdModel>(v.second));
 }
 
 template<simd_access::specialization_of<std::pair>... Args>
@@ -1006,18 +1059,18 @@ inline void simd_members(auto&& func, Args&&... values)
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Deduced type of the scalar structure, of which `SimdSize` number of objects will be combined in a
  *   structure-of-simd.
- * @tparam SimdSize Deduced vector size of the simd type.
+ * @tparam SimdModel Simd type acting as type model.
  * @param location Address of the memory location, at which the first scalar element is stored.
  * @return A simd value.
  */
-template<size_t ElementSize, class T, int SimdSize>
+template<size_t ElementSize, class T, class SimdModel>
   requires (!simd_arithmetic<T>)
-inline auto load(const linear_location<T, SimdSize>& location)
+inline auto load(const linear_location<T, SimdModel>& location)
 {
-  auto result = simdized_value<SimdSize>(*location.base_);
+  auto result = simdized_value<SimdModel>(*location.base_);
   simd_members([&](auto&& dest, auto&& src)
     {
-      dest = load<ElementSize>(linear_location<std::remove_reference_t<decltype(src)>, SimdSize>{&src});
+      dest = load<ElementSize>(linear_location<std::remove_reference_t<decltype(src)>, SimdModel>{&src});
     },
     result, *location.base_);
   return result;
@@ -1038,7 +1091,7 @@ template<class BaseType, simd_index IndexType>
   requires (!simd_arithmetic<BaseType>)
 inline auto load_rvalue(auto&& base, const IndexType& idx, auto&& subobject)
 {
-  decltype(simdized_value<IndexType::size()>(std::declval<BaseType>())) result;
+  decltype(simdized_value<index_model_t<IndexType>>(std::declval<BaseType>())) result;
   for (decltype(idx.size()) i = 0, e = idx.size(); i < e; ++i)
   {
     simd_members([&](auto&& dest, auto&& src)
@@ -1063,7 +1116,7 @@ template<class BaseType, simd_index IndexType>
   requires (!simd_arithmetic<BaseType>)
 inline auto load_rvalue(auto&& base, const IndexType& idx)
 {
-  decltype(simdized_value<IndexType::size()>(std::declval<BaseType>())) result;
+  decltype(simdized_value<index_model_t<IndexType>>(std::declval<BaseType>())) result;
   for (decltype(idx.size()) i = 0, e = idx.size(); i < e; ++i)
   {
     simd_members([&](auto&& dest, auto&& src)
@@ -1081,20 +1134,20 @@ inline auto load_rvalue(auto&& base, const IndexType& idx)
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Deduced type of the scalar structure, of which `SimdSize`number of objects are combined in a
  *   structure-of-simd.
- * @tparam SimdSize Deduced vector size of the simd type.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ExprType Deduced type of the source expression.
  * @param location Address of the memory location, to which the first scalar element is about to be stored.
  * @param expr The expression, whose result is stored. Must be convertible to a structure-of-simd.
  */
-template<size_t ElementSize, class T, class ExprType, int SimdSize>
+template<size_t ElementSize, class T, class ExprType, class SimdModel>
   requires (!simd_arithmetic<T>)
-inline void store(const linear_location<T, SimdSize>& location, const ExprType& expr)
+inline void store(const linear_location<T, SimdModel>& location, const ExprType& expr)
 {
-  const decltype(simdized_value<SimdSize>(std::declval<T>()))& source = expr;
+  const decltype(simdized_value<SimdModel>(std::declval<T>()))& source = expr;
   simd_members([&](auto&& dest, auto&& src)
     {
       store<ElementSize>(
-        linear_location<std::remove_reference_t<decltype(dest)>, SimdSize>{&dest}, src);
+        linear_location<std::remove_reference_t<decltype(dest)>, SimdModel>{&dest}, src);
     },
     *location.base_, source);
 }
@@ -1105,19 +1158,19 @@ inline void store(const linear_location<T, SimdSize>& location, const ExprType& 
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Deduced type of the scalar structure, of which `SimdSize` number of objects will be combined in a
  *   structure-of-simd.
- * @tparam SimdSize Deduced vector size of the simd type.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ArrayType Deduced type of the array storing the indices.
  * @param location Address and indices of the memory location.
  * @return A simd value.
  */
-template<size_t ElementSize, class T, int SimdSize, class IndexArray>
+template<size_t ElementSize, class T, class SimdModel, class IndexArray>
   requires (!simd_arithmetic<T>)
-inline auto load(const indexed_location<T, SimdSize, IndexArray>& location)
+inline auto load(const indexed_location<T, SimdModel, IndexArray>& location)
 {
-  auto result = simdized_value<SimdSize>(*location.base_);
+  auto result = simdized_value<SimdModel>(*location.base_);
   simd_members([&](auto&& dest, auto&& src)
     {
-      dest = load<ElementSize>(indexed_location<std::remove_reference_t<decltype(src)>, SimdSize, IndexArray>{
+      dest = load<ElementSize>(indexed_location<std::remove_reference_t<decltype(src)>, SimdModel, IndexArray>{
         &src, location.indices_});
     },
     result, *location.base_);
@@ -1130,20 +1183,20 @@ inline auto load(const indexed_location<T, SimdSize, IndexArray>& location)
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Deduced type of the scalar structure, of which `SimdSize`number of objects are combined in a
  *   structure-of-simd.
- * @tparam SimdSize Deduced vector size of the simd type.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ArrayType Deduced type of the array storing the indices.
  * @tparam ExprType Deduced type of the source expression.
  * @param location Address and indices of the memory location.
  * @param expr The expression, whose result is stored. Must be convertible to a structure-of-simd.
  */
-template<size_t ElementSize, class T, class ExprType, int SimdSize, class IndexArray>
+template<size_t ElementSize, class T, class ExprType, class SimdModel, class IndexArray>
   requires (!simd_arithmetic<T>)
-inline void store(const indexed_location<T, SimdSize, IndexArray>& location, const ExprType& expr)
+inline void store(const indexed_location<T, SimdModel, IndexArray>& location, const ExprType& expr)
 {
-  const decltype(simdized_value<SimdSize>(std::declval<T>()))& source = expr;
+  const decltype(simdized_value<SimdModel>(std::declval<T>()))& source = expr;
   simd_members([&](auto&& dest, auto&& src)
     {
-      using location_type = indexed_location<std::remove_reference_t<decltype(dest)>, SimdSize, IndexArray>;
+      using location_type = indexed_location<std::remove_reference_t<decltype(dest)>, SimdModel, IndexArray>;
       store<ElementSize>(location_type{&dest, location.indices_}, src);
     }, *location.base_, source);
 }
@@ -1238,7 +1291,7 @@ struct simdized_by_index<T, IndexType>
 template<class T, simd_index IndexType>
 struct simdized_by_index<T, IndexType>
 {
-  using type = decltype(simdized_value<IndexType::size()>(std::declval<T>()));
+  using type = decltype(simdized_value<index_model_t<IndexType>>(std::declval<T>()));
 };
 
 /// Type which resolves either to `T` or - if `IndexType` is a simd index - to the simdized type of `T`.
@@ -1302,7 +1355,7 @@ namespace simd_access
 {
 
 /// Forward declaration
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct universal_simd;
 
 template<typename T>
@@ -1316,44 +1369,45 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
   stdx_simd<PotentialSimdType> ||
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, int SimdSize>(universal_simd<T, SimdSize>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x)
+    { []<class T, class SimdModel>(universal_simd<T, SimdModel>&){}(x); };
 
 /// Helper class to auto-generate either a `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct auto_simd
 {
   /// Universal simd type.
-  using type = universal_simd<T, SimdSize>;
+  using type = universal_simd<T, SimdModel>;
 };
 
 /// Specialization of \ref auto_simd for the `stdx::simd` variant,
 /**
  * @tparam T Arithmetic value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<simd_arithmetic T, int SimdSize>
-struct auto_simd<T, SimdSize>
+template<simd_arithmetic T, class SimdModel>
+struct auto_simd<T, SimdModel>
 {
   /// stdx::simd type.
-  using type = stdx::fixed_size_simd<T, SimdSize>;
+  using type = stdx::rebind_simd_t<T, SimdModel>;
 };
 
 /// Type which resolves either to `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type. If arithmetic, the resulting type is a `stdx::simd`. Otherwise it is a `universal_simd`.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
-using auto_simd_t = typename auto_simd<T, SimdSize>::type;
+template<class T, class SimdModel>
+using auto_simd_t = typename auto_simd<T, SimdModel>::type;
 
 } //namespace simd_access
 
@@ -1390,7 +1444,7 @@ namespace simd_access
 {
 
 /// Forward declaration
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct universal_simd;
 
 template<typename T>
@@ -1404,44 +1458,45 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
   stdx_simd<PotentialSimdType> ||
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, int SimdSize>(universal_simd<T, SimdSize>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x)
+    { []<class T, class SimdModel>(universal_simd<T, SimdModel>&){}(x); };
 
 /// Helper class to auto-generate either a `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct auto_simd
 {
   /// Universal simd type.
-  using type = universal_simd<T, SimdSize>;
+  using type = universal_simd<T, SimdModel>;
 };
 
 /// Specialization of \ref auto_simd for the `stdx::simd` variant,
 /**
  * @tparam T Arithmetic value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<simd_arithmetic T, int SimdSize>
-struct auto_simd<T, SimdSize>
+template<simd_arithmetic T, class SimdModel>
+struct auto_simd<T, SimdModel>
 {
   /// stdx::simd type.
-  using type = stdx::fixed_size_simd<T, SimdSize>;
+  using type = stdx::rebind_simd_t<T, SimdModel>;
 };
 
 /// Type which resolves either to `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type. If arithmetic, the resulting type is a `stdx::simd`. Otherwise it is a `universal_simd`.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
-using auto_simd_t = typename auto_simd<T, SimdSize>::type;
+template<class T, class SimdModel>
+using auto_simd_t = typename auto_simd<T, SimdModel>::type;
 
 } //namespace simd_access
 
@@ -1465,13 +1520,15 @@ namespace simd_access
 /// Specifies a location for a simd variable stored in memory as a consecutive sequence of elements.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct linear_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to the first element of the sequence.
   T* base_;
 
@@ -1483,7 +1540,7 @@ struct linear_location
   template<auto Member>
   auto member_access() const
   {
-    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize>{&(base_->*Member)};
+    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel>{&(base_->*Member)};
   }
 
   /// Creation of a linear location for an element of `T`, if `T` is an array.
@@ -1493,21 +1550,23 @@ struct linear_location
    */
   auto array_access(auto i) const
   {
-    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize>{&((*base_)[i])};
+    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel>{&((*base_)[i])};
   }
 };
 
 /// Specifies a location for a simd variable with the indices of its values stored in an array.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ArrayType Type of the array, which stores the indices.
  */
-template<class T, int SimdSize, class ArrayType>
+template<class T, class SimdModel, class ArrayType>
 struct indexed_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to element zero of the sequence.
   T* base_;
   /// Reference to the index array.
@@ -1521,7 +1580,7 @@ struct indexed_location
   template<auto Member>
   auto member_access() const
   {
-    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel, ArrayType>
       {&(base_->*Member), indices_};
   }
 
@@ -1532,7 +1591,7 @@ struct indexed_location
    */
   auto array_access(auto i) const
   {
-    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel, ArrayType>
       {&((*base_)[i]), indices_};
   }
 };
@@ -1549,17 +1608,20 @@ class value_access;
 
 /// Class representing a simd index to a consecutive sequence of elements.
 /**
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam IndexType Type of the scalar index.
  */
-template<int SimdSize, class IndexType = size_t>
+template<class SimdModel, class IndexType = size_t>
 struct index
 {
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
+
   /// Return the length of the simd sequence.
   /**
    * @return The length of the simd sequence.
    */
-  static constexpr int size() { return SimdSize; }
+  static auto size() { return SimdModel::size(); }
 
   /// Return the scalar index of a vector lane.
   /**
@@ -1580,7 +1642,7 @@ struct index
   template<class T>
   auto operator[](T* data) const
   {
-    return value_access<linear_location<T, SimdSize>, sizeof(T)>(linear_location<T, SimdSize>{data + index_});
+    return value_access<linear_location<T, SimdModel>, sizeof(T)>(linear_location<T, SimdModel>{data + index_});
   }
 
   /// Transforms this to a simd value.
@@ -1589,27 +1651,27 @@ struct index
    */
   auto to_simd() const
   {
-    return stdx::fixed_size_simd<IndexType, SimdSize>([this](auto i){ return IndexType(index_ + i); });
+    return stdx::rebind_simd_t<IndexType, SimdModel>([this](auto i){ return IndexType(index_ + i); });
   }
 };
 
 template<class PotentialIndexType>
 concept simd_index =
   (stdx_simd<PotentialIndexType> && std::is_integral_v<typename PotentialIndexType::value_type>) ||
-  requires(std::remove_cvref_t<PotentialIndexType> x) { []<int SimdSize, class IndexType>(index<SimdSize, IndexType>&){}(x); };
+  requires(std::remove_cvref_t<PotentialIndexType> x) { []<class SimdModel, class IndexType>(index<SimdModel, IndexType>&){}(x); };
 
 /// TODO: Introduce masked_index to support e.g. residual masked loops.
 
 /// Returns the scalar index of a specific vector lane for a linear index.
 /**
- * @tparam SimdSize Deduced simd size.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam IndexType Deduced type of the scalar index.
  * @param idx Linear simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx.start + i`.
  */
-template<int SimdSize, class IndexType>
-inline auto scalar_index(const index<SimdSize, IndexType>& idx, auto i)
+template<class SimdModel, class IndexType>
+inline auto scalar_index(const index<SimdModel, IndexType>& idx, auto i)
 {
   return idx.scalar_index(i);
 }
@@ -1630,16 +1692,31 @@ inline auto scalar_index(const stdx::simd<IndexType, SimdModel>& idx, auto i)
 
 /// Returns true, if the argument is a simd index (i.e. fullfills the concept `simd_index`).
 /**
- * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam SimdModel Deduced abi of the `simd` paramter.
- * @param idx Indirect simd index.
- * @param i Vector lane.
- * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
+ * @param idx Potential simd index.
+ * @return True, if the type of idx fulfills `simd_index` concept.
  */
- constexpr inline auto is_simd_index(auto&& idx)
+constexpr inline auto is_simd_index(auto&& idx)
 {
   return simd_index<decltype(idx)>;
 }
+
+template<class T>
+struct index_model;
+
+template<class SimdModel, class IndexType>
+struct index_model<index<SimdModel, IndexType>>
+{
+  using type = SimdModel;
+};
+
+template<std::integral Index, class Abi>
+struct index_model<stdx::simd<Index, Abi>>
+{
+  using type = stdx::simd<Index, Abi>;
+};
+
+template<simd_index T>
+using index_model_t = typename index_model<T>::type;
 
 } //namespace simd_access
 
@@ -1833,7 +1910,7 @@ namespace simd_access
 {
 
 /// Forward declaration
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct universal_simd;
 
 template<typename T>
@@ -1847,44 +1924,45 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
   stdx_simd<PotentialSimdType> ||
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, int SimdSize>(universal_simd<T, SimdSize>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x)
+    { []<class T, class SimdModel>(universal_simd<T, SimdModel>&){}(x); };
 
 /// Helper class to auto-generate either a `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct auto_simd
 {
   /// Universal simd type.
-  using type = universal_simd<T, SimdSize>;
+  using type = universal_simd<T, SimdModel>;
 };
 
 /// Specialization of \ref auto_simd for the `stdx::simd` variant,
 /**
  * @tparam T Arithmetic value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<simd_arithmetic T, int SimdSize>
-struct auto_simd<T, SimdSize>
+template<simd_arithmetic T, class SimdModel>
+struct auto_simd<T, SimdModel>
 {
   /// stdx::simd type.
-  using type = stdx::fixed_size_simd<T, SimdSize>;
+  using type = stdx::rebind_simd_t<T, SimdModel>;
 };
 
 /// Type which resolves either to `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type. If arithmetic, the resulting type is a `stdx::simd`. Otherwise it is a `universal_simd`.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
-using auto_simd_t = typename auto_simd<T, SimdSize>::type;
+template<class T, class SimdModel>
+using auto_simd_t = typename auto_simd<T, SimdModel>::type;
 
 } //namespace simd_access
 
@@ -1908,13 +1986,15 @@ namespace simd_access
 /// Specifies a location for a simd variable stored in memory as a consecutive sequence of elements.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct linear_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to the first element of the sequence.
   T* base_;
 
@@ -1926,7 +2006,7 @@ struct linear_location
   template<auto Member>
   auto member_access() const
   {
-    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize>{&(base_->*Member)};
+    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel>{&(base_->*Member)};
   }
 
   /// Creation of a linear location for an element of `T`, if `T` is an array.
@@ -1936,21 +2016,23 @@ struct linear_location
    */
   auto array_access(auto i) const
   {
-    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize>{&((*base_)[i])};
+    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel>{&((*base_)[i])};
   }
 };
 
 /// Specifies a location for a simd variable with the indices of its values stored in an array.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ArrayType Type of the array, which stores the indices.
  */
-template<class T, int SimdSize, class ArrayType>
+template<class T, class SimdModel, class ArrayType>
 struct indexed_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to element zero of the sequence.
   T* base_;
   /// Reference to the index array.
@@ -1964,7 +2046,7 @@ struct indexed_location
   template<auto Member>
   auto member_access() const
   {
-    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel, ArrayType>
       {&(base_->*Member), indices_};
   }
 
@@ -1975,7 +2057,7 @@ struct indexed_location
    */
   auto array_access(auto i) const
   {
-    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel, ArrayType>
       {&((*base_)[i]), indices_};
   }
 };
@@ -1992,17 +2074,20 @@ class value_access;
 
 /// Class representing a simd index to a consecutive sequence of elements.
 /**
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam IndexType Type of the scalar index.
  */
-template<int SimdSize, class IndexType = size_t>
+template<class SimdModel, class IndexType = size_t>
 struct index
 {
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
+
   /// Return the length of the simd sequence.
   /**
    * @return The length of the simd sequence.
    */
-  static constexpr int size() { return SimdSize; }
+  static auto size() { return SimdModel::size(); }
 
   /// Return the scalar index of a vector lane.
   /**
@@ -2023,7 +2108,7 @@ struct index
   template<class T>
   auto operator[](T* data) const
   {
-    return value_access<linear_location<T, SimdSize>, sizeof(T)>(linear_location<T, SimdSize>{data + index_});
+    return value_access<linear_location<T, SimdModel>, sizeof(T)>(linear_location<T, SimdModel>{data + index_});
   }
 
   /// Transforms this to a simd value.
@@ -2032,27 +2117,27 @@ struct index
    */
   auto to_simd() const
   {
-    return stdx::fixed_size_simd<IndexType, SimdSize>([this](auto i){ return IndexType(index_ + i); });
+    return stdx::rebind_simd_t<IndexType, SimdModel>([this](auto i){ return IndexType(index_ + i); });
   }
 };
 
 template<class PotentialIndexType>
 concept simd_index =
   (stdx_simd<PotentialIndexType> && std::is_integral_v<typename PotentialIndexType::value_type>) ||
-  requires(std::remove_cvref_t<PotentialIndexType> x) { []<int SimdSize, class IndexType>(index<SimdSize, IndexType>&){}(x); };
+  requires(std::remove_cvref_t<PotentialIndexType> x) { []<class SimdModel, class IndexType>(index<SimdModel, IndexType>&){}(x); };
 
 /// TODO: Introduce masked_index to support e.g. residual masked loops.
 
 /// Returns the scalar index of a specific vector lane for a linear index.
 /**
- * @tparam SimdSize Deduced simd size.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam IndexType Deduced type of the scalar index.
  * @param idx Linear simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx.start + i`.
  */
-template<int SimdSize, class IndexType>
-inline auto scalar_index(const index<SimdSize, IndexType>& idx, auto i)
+template<class SimdModel, class IndexType>
+inline auto scalar_index(const index<SimdModel, IndexType>& idx, auto i)
 {
   return idx.scalar_index(i);
 }
@@ -2073,16 +2158,31 @@ inline auto scalar_index(const stdx::simd<IndexType, SimdModel>& idx, auto i)
 
 /// Returns true, if the argument is a simd index (i.e. fullfills the concept `simd_index`).
 /**
- * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam SimdModel Deduced abi of the `simd` paramter.
- * @param idx Indirect simd index.
- * @param i Vector lane.
- * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
+ * @param idx Potential simd index.
+ * @return True, if the type of idx fulfills `simd_index` concept.
  */
- constexpr inline auto is_simd_index(auto&& idx)
+constexpr inline auto is_simd_index(auto&& idx)
 {
   return simd_index<decltype(idx)>;
 }
+
+template<class T>
+struct index_model;
+
+template<class SimdModel, class IndexType>
+struct index_model<index<SimdModel, IndexType>>
+{
+  using type = SimdModel;
+};
+
+template<std::integral Index, class Abi>
+struct index_model<stdx::simd<Index, Abi>>
+{
+  using type = stdx::simd<Index, Abi>;
+};
+
+template<simd_index T>
+using index_model_t = typename index_model<T>::type;
 
 } //namespace simd_access
 
@@ -2116,7 +2216,7 @@ namespace simd_access
 {
 
 /// Forward declaration
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct universal_simd;
 
 template<typename T>
@@ -2130,44 +2230,45 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
   stdx_simd<PotentialSimdType> ||
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, int SimdSize>(universal_simd<T, SimdSize>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x)
+    { []<class T, class SimdModel>(universal_simd<T, SimdModel>&){}(x); };
 
 /// Helper class to auto-generate either a `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct auto_simd
 {
   /// Universal simd type.
-  using type = universal_simd<T, SimdSize>;
+  using type = universal_simd<T, SimdModel>;
 };
 
 /// Specialization of \ref auto_simd for the `stdx::simd` variant,
 /**
  * @tparam T Arithmetic value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<simd_arithmetic T, int SimdSize>
-struct auto_simd<T, SimdSize>
+template<simd_arithmetic T, class SimdModel>
+struct auto_simd<T, SimdModel>
 {
   /// stdx::simd type.
-  using type = stdx::fixed_size_simd<T, SimdSize>;
+  using type = stdx::rebind_simd_t<T, SimdModel>;
 };
 
 /// Type which resolves either to `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type. If arithmetic, the resulting type is a `stdx::simd`. Otherwise it is a `universal_simd`.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
-using auto_simd_t = typename auto_simd<T, SimdSize>::type;
+template<class T, class SimdModel>
+using auto_simd_t = typename auto_simd<T, SimdModel>::type;
 
 } //namespace simd_access
 
@@ -2191,13 +2292,15 @@ namespace simd_access
 /// Specifies a location for a simd variable stored in memory as a consecutive sequence of elements.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct linear_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to the first element of the sequence.
   T* base_;
 
@@ -2209,7 +2312,7 @@ struct linear_location
   template<auto Member>
   auto member_access() const
   {
-    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize>{&(base_->*Member)};
+    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel>{&(base_->*Member)};
   }
 
   /// Creation of a linear location for an element of `T`, if `T` is an array.
@@ -2219,21 +2322,23 @@ struct linear_location
    */
   auto array_access(auto i) const
   {
-    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize>{&((*base_)[i])};
+    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel>{&((*base_)[i])};
   }
 };
 
 /// Specifies a location for a simd variable with the indices of its values stored in an array.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ArrayType Type of the array, which stores the indices.
  */
-template<class T, int SimdSize, class ArrayType>
+template<class T, class SimdModel, class ArrayType>
 struct indexed_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to element zero of the sequence.
   T* base_;
   /// Reference to the index array.
@@ -2247,7 +2352,7 @@ struct indexed_location
   template<auto Member>
   auto member_access() const
   {
-    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel, ArrayType>
       {&(base_->*Member), indices_};
   }
 
@@ -2258,7 +2363,7 @@ struct indexed_location
    */
   auto array_access(auto i) const
   {
-    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel, ArrayType>
       {&((*base_)[i]), indices_};
   }
 };
@@ -2298,7 +2403,7 @@ namespace simd_access
 {
 
 /// Forward declaration
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct universal_simd;
 
 template<typename T>
@@ -2312,44 +2417,45 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
   stdx_simd<PotentialSimdType> ||
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, int SimdSize>(universal_simd<T, SimdSize>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x)
+    { []<class T, class SimdModel>(universal_simd<T, SimdModel>&){}(x); };
 
 /// Helper class to auto-generate either a `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct auto_simd
 {
   /// Universal simd type.
-  using type = universal_simd<T, SimdSize>;
+  using type = universal_simd<T, SimdModel>;
 };
 
 /// Specialization of \ref auto_simd for the `stdx::simd` variant,
 /**
  * @tparam T Arithmetic value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<simd_arithmetic T, int SimdSize>
-struct auto_simd<T, SimdSize>
+template<simd_arithmetic T, class SimdModel>
+struct auto_simd<T, SimdModel>
 {
   /// stdx::simd type.
-  using type = stdx::fixed_size_simd<T, SimdSize>;
+  using type = stdx::rebind_simd_t<T, SimdModel>;
 };
 
 /// Type which resolves either to `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type. If arithmetic, the resulting type is a `stdx::simd`. Otherwise it is a `universal_simd`.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
-using auto_simd_t = typename auto_simd<T, SimdSize>::type;
+template<class T, class SimdModel>
+using auto_simd_t = typename auto_simd<T, SimdModel>::type;
 
 } //namespace simd_access
 
@@ -2373,13 +2479,15 @@ namespace simd_access
 /// Specifies a location for a simd variable stored in memory as a consecutive sequence of elements.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct linear_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to the first element of the sequence.
   T* base_;
 
@@ -2391,7 +2499,7 @@ struct linear_location
   template<auto Member>
   auto member_access() const
   {
-    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize>{&(base_->*Member)};
+    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel>{&(base_->*Member)};
   }
 
   /// Creation of a linear location for an element of `T`, if `T` is an array.
@@ -2401,21 +2509,23 @@ struct linear_location
    */
   auto array_access(auto i) const
   {
-    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize>{&((*base_)[i])};
+    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel>{&((*base_)[i])};
   }
 };
 
 /// Specifies a location for a simd variable with the indices of its values stored in an array.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ArrayType Type of the array, which stores the indices.
  */
-template<class T, int SimdSize, class ArrayType>
+template<class T, class SimdModel, class ArrayType>
 struct indexed_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to element zero of the sequence.
   T* base_;
   /// Reference to the index array.
@@ -2429,7 +2539,7 @@ struct indexed_location
   template<auto Member>
   auto member_access() const
   {
-    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel, ArrayType>
       {&(base_->*Member), indices_};
   }
 
@@ -2440,7 +2550,7 @@ struct indexed_location
    */
   auto array_access(auto i) const
   {
-    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel, ArrayType>
       {&((*base_)[i]), indices_};
   }
 };
@@ -2457,17 +2567,20 @@ class value_access;
 
 /// Class representing a simd index to a consecutive sequence of elements.
 /**
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam IndexType Type of the scalar index.
  */
-template<int SimdSize, class IndexType = size_t>
+template<class SimdModel, class IndexType = size_t>
 struct index
 {
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
+
   /// Return the length of the simd sequence.
   /**
    * @return The length of the simd sequence.
    */
-  static constexpr int size() { return SimdSize; }
+  static auto size() { return SimdModel::size(); }
 
   /// Return the scalar index of a vector lane.
   /**
@@ -2488,7 +2601,7 @@ struct index
   template<class T>
   auto operator[](T* data) const
   {
-    return value_access<linear_location<T, SimdSize>, sizeof(T)>(linear_location<T, SimdSize>{data + index_});
+    return value_access<linear_location<T, SimdModel>, sizeof(T)>(linear_location<T, SimdModel>{data + index_});
   }
 
   /// Transforms this to a simd value.
@@ -2497,27 +2610,27 @@ struct index
    */
   auto to_simd() const
   {
-    return stdx::fixed_size_simd<IndexType, SimdSize>([this](auto i){ return IndexType(index_ + i); });
+    return stdx::rebind_simd_t<IndexType, SimdModel>([this](auto i){ return IndexType(index_ + i); });
   }
 };
 
 template<class PotentialIndexType>
 concept simd_index =
   (stdx_simd<PotentialIndexType> && std::is_integral_v<typename PotentialIndexType::value_type>) ||
-  requires(std::remove_cvref_t<PotentialIndexType> x) { []<int SimdSize, class IndexType>(index<SimdSize, IndexType>&){}(x); };
+  requires(std::remove_cvref_t<PotentialIndexType> x) { []<class SimdModel, class IndexType>(index<SimdModel, IndexType>&){}(x); };
 
 /// TODO: Introduce masked_index to support e.g. residual masked loops.
 
 /// Returns the scalar index of a specific vector lane for a linear index.
 /**
- * @tparam SimdSize Deduced simd size.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam IndexType Deduced type of the scalar index.
  * @param idx Linear simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx.start + i`.
  */
-template<int SimdSize, class IndexType>
-inline auto scalar_index(const index<SimdSize, IndexType>& idx, auto i)
+template<class SimdModel, class IndexType>
+inline auto scalar_index(const index<SimdModel, IndexType>& idx, auto i)
 {
   return idx.scalar_index(i);
 }
@@ -2538,20 +2651,37 @@ inline auto scalar_index(const stdx::simd<IndexType, SimdModel>& idx, auto i)
 
 /// Returns true, if the argument is a simd index (i.e. fullfills the concept `simd_index`).
 /**
- * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam SimdModel Deduced abi of the `simd` paramter.
- * @param idx Indirect simd index.
- * @param i Vector lane.
- * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
+ * @param idx Potential simd index.
+ * @return True, if the type of idx fulfills `simd_index` concept.
  */
- constexpr inline auto is_simd_index(auto&& idx)
+constexpr inline auto is_simd_index(auto&& idx)
 {
   return simd_index<decltype(idx)>;
 }
 
+template<class T>
+struct index_model;
+
+template<class SimdModel, class IndexType>
+struct index_model<index<SimdModel, IndexType>>
+{
+  using type = SimdModel;
+};
+
+template<std::integral Index, class Abi>
+struct index_model<stdx::simd<Index, Abi>>
+{
+  using type = stdx::simd<Index, Abi>;
+};
+
+template<simd_index T>
+using index_model_t = typename index_model<T>::type;
+
 } //namespace simd_access
 
 #endif //SIMD_ACCESS_INDEX
+
+#include <experimental/bits/simd.h>
 
 namespace simd_access
 {
@@ -2561,12 +2691,13 @@ namespace simd_access
  * stored at the positions base, base+ElementSize, base+2*ElementSize, ...
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Deduced type of a simd element.
- * @tparam SimdSize Deduced vector size of the simd type.
+ * @tparam SimdModel Deduced simd type acting as type model.
+ * @tparam Abi Deduced Abi tag type.
  * @param location Address of the memory location, at which the first simd element is stored.
  * @param source Simd value to be stored.
  */
-template<size_t ElementSize, simd_arithmetic T, int SimdSize>
-inline void store(const linear_location<T, SimdSize>& location, const stdx::fixed_size_simd<T, SimdSize>& source)
+template<size_t ElementSize, simd_arithmetic T, class SimdModel, class Abi>
+inline void store(const linear_location<T, SimdModel>& location, const stdx::simd<T, Abi>& source)
 {
   if constexpr (sizeof(T) == ElementSize)
   {
@@ -2575,7 +2706,7 @@ inline void store(const linear_location<T, SimdSize>& location, const stdx::fixe
   else
   {
     // scatter with constant pitch
-    for (int i = 0; i < SimdSize; ++i)
+    for (int i = 0; i < source.size(); ++i)
     {
       *reinterpret_cast<T*>(reinterpret_cast<char*>(location.base_) + ElementSize * i) = source[i];
     }
@@ -2587,17 +2718,17 @@ inline void store(const linear_location<T, SimdSize>& location, const stdx::fixe
  * stored at the positions base+indices[0]*ElementSize, base+indices[1]*ElementSize, ...
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Deduced type of a simd element.
- * @tparam SimdSize Deduced vector size of the simd type.
+ * @tparam SimdModel Deduced simd type acting as type model.
+ * @tparam Abi Deduced Abi tag type.
  * @tparam ArrayType Deduced type of the array storing the indices.
  * @param location Address and indices of the memory location.
  * @param source Simd value to be stored.
  */
-template<size_t ElementSize, simd_arithmetic T, int SimdSize, class ArrayType>
-inline void store(const indexed_location<T, SimdSize, ArrayType>& location,
-  const stdx::fixed_size_simd<T, SimdSize>& source)
+template<size_t ElementSize, simd_arithmetic T, class SimdModel, class Abi, class ArrayType>
+inline void store(const indexed_location<T, SimdModel, ArrayType>& location, const stdx::simd<T, Abi>& source)
 {
   // scatter with indirect indices
-  for (int i = 0; i < SimdSize; ++i)
+  for (int i = 0; i < source.size(); ++i)
   {
     *reinterpret_cast<T*>(reinterpret_cast<char*>(location.base_) + ElementSize * location.indices_[i]) = source[i];
   }
@@ -2608,14 +2739,14 @@ inline void store(const indexed_location<T, SimdSize, ArrayType>& location,
  * loaded are located at the positions base, base+ElementSize, base+2*ElementSize, ...
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Type of a simd element.
- * @tparam SimdSize Vector size of the simd type.
+ * @tparam SimdModel Deduced simd type acting as type model.
  * @param location Address of the memory location, at which the first scalar element is stored.
  * @return A simd value.
  */
-template<size_t ElementSize, simd_arithmetic T, int SimdSize>
-inline auto load(const linear_location<T, SimdSize>& location)
+template<size_t ElementSize, simd_arithmetic T, class SimdModel>
+inline auto load(const linear_location<T, SimdModel>& location)
 {
-  using ResultType = stdx::fixed_size_simd<std::remove_const_t<T>, SimdSize>;
+  using ResultType = stdx::rebind_simd_t<std::remove_const_t<T>, SimdModel>;
   if constexpr (sizeof(T) == ElementSize)
   {
     return ResultType(location.base_, stdx::element_aligned);
@@ -2635,16 +2766,17 @@ inline auto load(const linear_location<T, SimdSize>& location)
  * loaded are stored at the positions base+indices[0]*ElementSize, base+indices[1]*ElementSize, ...
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Deduced type of a simd element.
- * @tparam SimdSize Deduced vector size of the simd type.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ArrayType Deduced type of the array storing the indices.
  * @param location Address and indices of the memory location.
  * @return A simd value.
  */
-template<size_t ElementSize, simd_arithmetic T, int SimdSize, class ArrayType>
-inline auto load(const indexed_location<T, SimdSize, ArrayType>& location)
+template<size_t ElementSize, simd_arithmetic T, class SimdModel, class ArrayType>
+inline auto load(const indexed_location<T, SimdModel, ArrayType>& location)
 {
+  using ResultType = stdx::rebind_simd_t<std::remove_const_t<T>, SimdModel>;
   // gather with indirect indices
-  return stdx::fixed_size_simd<std::remove_const_t<T>, SimdSize>([&](int i)
+  return ResultType([&](int i)
     {
       return *reinterpret_cast<const T*>
         (reinterpret_cast<const char*>(location.base_) + ElementSize * location.indices_[i]);
@@ -2662,7 +2794,8 @@ inline auto load(const indexed_location<T, SimdSize, ArrayType>& location)
 template<simd_arithmetic BaseType, simd_index IndexType>
 inline auto load_rvalue(auto&& base, const IndexType& idx)
 {
-  return stdx::fixed_size_simd<BaseType, IndexType::size()>([&](auto i) { return base[scalar_index(idx, i)]; });
+  using ResultType = stdx::rebind_simd_t<BaseType, index_model_t<IndexType>>;
+  return ResultType([&](auto i) { return base[scalar_index(idx, i)]; });
 }
 
 /**
@@ -2678,7 +2811,8 @@ inline auto load_rvalue(auto&& base, const IndexType& idx)
 template<simd_arithmetic BaseType, simd_index IndexType>
 inline auto load_rvalue(auto&& base, const IndexType& idx, auto&& subobject)
 {
-  return stdx::fixed_size_simd<BaseType, IndexType::size()>([&](auto i)
+  using ResultType = stdx::rebind_simd_t<BaseType, index_model_t<IndexType>>;
+  return ResultType([&](auto i)
   {
     return subobject(base[scalar_index(idx, i)]);
   });
@@ -2732,7 +2866,7 @@ namespace simd_access
 {
 
 /// Forward declaration
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct universal_simd;
 
 template<typename T>
@@ -2746,44 +2880,45 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
   stdx_simd<PotentialSimdType> ||
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, int SimdSize>(universal_simd<T, SimdSize>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x)
+    { []<class T, class SimdModel>(universal_simd<T, SimdModel>&){}(x); };
 
 /// Helper class to auto-generate either a `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct auto_simd
 {
   /// Universal simd type.
-  using type = universal_simd<T, SimdSize>;
+  using type = universal_simd<T, SimdModel>;
 };
 
 /// Specialization of \ref auto_simd for the `stdx::simd` variant,
 /**
  * @tparam T Arithmetic value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<simd_arithmetic T, int SimdSize>
-struct auto_simd<T, SimdSize>
+template<simd_arithmetic T, class SimdModel>
+struct auto_simd<T, SimdModel>
 {
   /// stdx::simd type.
-  using type = stdx::fixed_size_simd<T, SimdSize>;
+  using type = stdx::rebind_simd_t<T, SimdModel>;
 };
 
 /// Type which resolves either to `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type. If arithmetic, the resulting type is a `stdx::simd`. Otherwise it is a `universal_simd`.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
-using auto_simd_t = typename auto_simd<T, SimdSize>::type;
+template<class T, class SimdModel>
+using auto_simd_t = typename auto_simd<T, SimdModel>::type;
 
 } //namespace simd_access
 
@@ -2807,13 +2942,15 @@ namespace simd_access
 /// Specifies a location for a simd variable stored in memory as a consecutive sequence of elements.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct linear_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to the first element of the sequence.
   T* base_;
 
@@ -2825,7 +2962,7 @@ struct linear_location
   template<auto Member>
   auto member_access() const
   {
-    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize>{&(base_->*Member)};
+    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel>{&(base_->*Member)};
   }
 
   /// Creation of a linear location for an element of `T`, if `T` is an array.
@@ -2835,21 +2972,23 @@ struct linear_location
    */
   auto array_access(auto i) const
   {
-    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize>{&((*base_)[i])};
+    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel>{&((*base_)[i])};
   }
 };
 
 /// Specifies a location for a simd variable with the indices of its values stored in an array.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ArrayType Type of the array, which stores the indices.
  */
-template<class T, int SimdSize, class ArrayType>
+template<class T, class SimdModel, class ArrayType>
 struct indexed_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to element zero of the sequence.
   T* base_;
   /// Reference to the index array.
@@ -2863,7 +3002,7 @@ struct indexed_location
   template<auto Member>
   auto member_access() const
   {
-    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel, ArrayType>
       {&(base_->*Member), indices_};
   }
 
@@ -2874,7 +3013,7 @@ struct indexed_location
    */
   auto array_access(auto i) const
   {
-    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel, ArrayType>
       {&((*base_)[i]), indices_};
   }
 };
@@ -2891,17 +3030,20 @@ class value_access;
 
 /// Class representing a simd index to a consecutive sequence of elements.
 /**
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam IndexType Type of the scalar index.
  */
-template<int SimdSize, class IndexType = size_t>
+template<class SimdModel, class IndexType = size_t>
 struct index
 {
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
+
   /// Return the length of the simd sequence.
   /**
    * @return The length of the simd sequence.
    */
-  static constexpr int size() { return SimdSize; }
+  static auto size() { return SimdModel::size(); }
 
   /// Return the scalar index of a vector lane.
   /**
@@ -2922,7 +3064,7 @@ struct index
   template<class T>
   auto operator[](T* data) const
   {
-    return value_access<linear_location<T, SimdSize>, sizeof(T)>(linear_location<T, SimdSize>{data + index_});
+    return value_access<linear_location<T, SimdModel>, sizeof(T)>(linear_location<T, SimdModel>{data + index_});
   }
 
   /// Transforms this to a simd value.
@@ -2931,27 +3073,27 @@ struct index
    */
   auto to_simd() const
   {
-    return stdx::fixed_size_simd<IndexType, SimdSize>([this](auto i){ return IndexType(index_ + i); });
+    return stdx::rebind_simd_t<IndexType, SimdModel>([this](auto i){ return IndexType(index_ + i); });
   }
 };
 
 template<class PotentialIndexType>
 concept simd_index =
   (stdx_simd<PotentialIndexType> && std::is_integral_v<typename PotentialIndexType::value_type>) ||
-  requires(std::remove_cvref_t<PotentialIndexType> x) { []<int SimdSize, class IndexType>(index<SimdSize, IndexType>&){}(x); };
+  requires(std::remove_cvref_t<PotentialIndexType> x) { []<class SimdModel, class IndexType>(index<SimdModel, IndexType>&){}(x); };
 
 /// TODO: Introduce masked_index to support e.g. residual masked loops.
 
 /// Returns the scalar index of a specific vector lane for a linear index.
 /**
- * @tparam SimdSize Deduced simd size.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam IndexType Deduced type of the scalar index.
  * @param idx Linear simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx.start + i`.
  */
-template<int SimdSize, class IndexType>
-inline auto scalar_index(const index<SimdSize, IndexType>& idx, auto i)
+template<class SimdModel, class IndexType>
+inline auto scalar_index(const index<SimdModel, IndexType>& idx, auto i)
 {
   return idx.scalar_index(i);
 }
@@ -2972,16 +3114,31 @@ inline auto scalar_index(const stdx::simd<IndexType, SimdModel>& idx, auto i)
 
 /// Returns true, if the argument is a simd index (i.e. fullfills the concept `simd_index`).
 /**
- * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam SimdModel Deduced abi of the `simd` paramter.
- * @param idx Indirect simd index.
- * @param i Vector lane.
- * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
+ * @param idx Potential simd index.
+ * @return True, if the type of idx fulfills `simd_index` concept.
  */
- constexpr inline auto is_simd_index(auto&& idx)
+constexpr inline auto is_simd_index(auto&& idx)
 {
   return simd_index<decltype(idx)>;
 }
+
+template<class T>
+struct index_model;
+
+template<class SimdModel, class IndexType>
+struct index_model<index<SimdModel, IndexType>>
+{
+  using type = SimdModel;
+};
+
+template<std::integral Index, class Abi>
+struct index_model<stdx::simd<Index, Abi>>
+{
+  using type = stdx::simd<Index, Abi>;
+};
+
+template<simd_index T>
+using index_model_t = typename index_model<T>::type;
 
 } //namespace simd_access
 
@@ -3002,7 +3159,7 @@ constexpr auto VectorResidualLoop = VectorResidualLoopT();
 /**
  * Linear simd-ized iteration over a function. The function is first called with a simd index and the remainder
  * loop is called with an integral index.
- * @tparam SimdSize Vector size.
+ * @tparam SimdModel Simd type acting as type model.
  * @param start Start of the iteration range [start, end).
  * @param end End of the iteration range [start, end).
  * @param fn Generic function to be called. Takes one argument, whose type is either `index<SimdSize, IntegralType>`
@@ -3012,14 +3169,15 @@ constexpr auto VectorResidualLoop = VectorResidualLoopT();
  *   case the user is responsible for the handling of indices possbily extending the valid iteration range. Defaults
  *   to `ScalarResidualLoop`.
  */
-template<int SimdSize, auto ... Args, typename ResidualLoopPolicyType = ScalarResidualLoopT>
+template<class SimdModel, auto ... Args, typename ResidualLoopPolicyType = ScalarResidualLoopT>
 inline void loop(std::integral auto start, std::integral auto end, auto&& fn,
   ResidualLoopPolicyType residualLoopPolicy = ScalarResidualLoop)
 {
   using IndexType = std::common_type_t<decltype(start), decltype(end)>;
-  index<SimdSize, IndexType> simd_i{IndexType(start)};
-  constexpr auto endOffset = residualLoopPolicy == ScalarResidualLoop ? 1 : SimdSize;
-  for (; simd_i.index_ + SimdSize < end + endOffset; simd_i.index_ += SimdSize)
+  index<SimdModel, IndexType> simd_i{IndexType(start)};
+  const auto simdSize = simd_i.size();
+  const auto endOffset = residualLoopPolicy == ScalarResidualLoop ? 1 : simdSize;
+  for (; simd_i.index_ + simdSize < end + endOffset; simd_i.index_ += simdSize)
   {
     if constexpr (sizeof...(Args) == 0)
     {
@@ -3050,7 +3208,8 @@ inline void loop(std::integral auto start, std::integral auto end, auto&& fn,
  * Linear simd-ized iteration over a function. The function is first called with an integral index until the
  * `alignTestFn` returns true for a specific index. From there on `alignTestFn` isn't called anymore and the function
  * is called with a simd index. The remainder loop is called with an integral index again.
- * @tparam SimdSize Vector size.
+ * @tparam SimdModel Simd type acting as type model.
+ * @tparam Args Optional additional template arguments passed to the function call operator.
  * @param start Start of the iteration range [start, end).
  * @param end End of the iteration range [start, end).
  * @param alignTestFn Generic function to be called. Takes one scalar argument of the common type of `start` and `end`.
@@ -3059,11 +3218,11 @@ inline void loop(std::integral auto start, std::integral auto end, auto&& fn,
  * @param fn Generic function to be called. Takes one argument, whose type is either `index<SimdSize, IntegralType>`
  *   or `IntegralType`.
  */
-template<int SimdSize, auto ... Args>
+template<class SimdModel, auto ... Args>
 inline void aligning_loop(std::integral auto start, std::integral auto end, auto&& alignTestFn, auto&& fn)
 {
   using IndexType = std::common_type_t<decltype(start), decltype(end)>;
-  index<SimdSize, IndexType> simd_i{IndexType(start)};
+  index<SimdModel, IndexType> simd_i{IndexType(start)};
   for (; simd_i.index_ < end && !alignTestFn(simd_i.index_); ++simd_i.index_)
   {
     if constexpr (sizeof...(Args) == 0)
@@ -3075,7 +3234,8 @@ inline void aligning_loop(std::integral auto start, std::integral auto end, auto
       fn.template operator()<Args...>(simd_i.index_);
     }
   }
-  for (; simd_i.index_ + SimdSize < end + 1; simd_i.index_ += SimdSize)
+  const auto simdSize = simd_i.size();
+  for (; simd_i.index_ + simdSize < end + 1; simd_i.index_ += simdSize)
   {
     if constexpr (sizeof...(Args) == 0)
     {
@@ -3102,7 +3262,7 @@ inline void aligning_loop(std::integral auto start, std::integral auto end, auto
 /**
  * Simd-ized iteration over a function using indirect indexing. The function is first called with an stdx::simd
  * and the remainder loop is called with an integral index.
- * @tparam SimdSize Vector size.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam Args Optional additional template arguments passed to the function call operator.
  * @tparam IteratorType Deduced type of the random access iterator defining the range of indices.
  * @param start Inclusive start of the range of indices.
@@ -3114,16 +3274,18 @@ inline void aligning_loop(std::integral auto start, std::integral auto end, auto
  *   case the user is responsible for the handling of indices possbily extending the valid iteration range. Defaults
  *   to `ScalarResidualLoop`.
  */
-template<int SimdSize, auto ... Args, std::random_access_iterator IteratorType,
+template<class SimdModel, auto ... Args, std::random_access_iterator IteratorType,
   typename ResidualLoopPolicyType = ScalarResidualLoopT>
 inline void loop(IteratorType start, const IteratorType& end, auto&& fn,
   ResidualLoopPolicyType residualLoopPolicy = ScalarResidualLoop)
 {
   size_t i = 0, i_end = end - start;
-  constexpr auto endOffset = residualLoopPolicy == ScalarResidualLoop ? 1 : SimdSize;
-  for (; i + SimdSize < i_end + endOffset; i += SimdSize)
+  using SimdIndexType = stdx::rebind_simd_t<std::decay_t<decltype(*start)>, SimdModel>;
+  const auto simdSize = SimdIndexType::size();
+  const auto endOffset = residualLoopPolicy == ScalarResidualLoop ? 1 : simdSize;
+  for (; i + simdSize < i_end + endOffset; i += simdSize)
   {
-    stdx::fixed_size_simd<std::decay_t<decltype(*start)>, SimdSize> simd_i([&](auto j) { return *(start + i + j); });
+    SimdIndexType simd_i([&](auto j) { return *(start + i + j); });
     if constexpr (sizeof...(Args) == 0)
     {
       fn(simd_i);
@@ -3152,7 +3314,7 @@ inline void loop(IteratorType start, const IteratorType& end, auto&& fn,
 /**
  * Simd-ized iteration over a function using indirect indexing. The function is first called with an stdx::simd
  * and the remainder loop is called with an integral index.
- * @tparam SimdSize Vector size.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam Args Optional additional template arguments passed to the function call operator.
  * @tparam IteratorType Deduced type of the random access iterator defining the range of indices.
  * @param start Inclusive start of the range of indices.
@@ -3165,18 +3327,19 @@ inline void loop(IteratorType start, const IteratorType& end, auto&& fn,
  *   case the user is responsible for the handling of indices possbily extending the valid iteration range. Defaults
  *   to `ScalarResidualLoop`.
  */
-template<int SimdSize, auto ... Args, std::random_access_iterator IteratorType,
+template<class SimdModel, auto ... Args, std::random_access_iterator IteratorType,
   typename ResidualLoopPolicyType = ScalarResidualLoopT>
 inline void loop_with_linear_index(IteratorType start, const IteratorType& end, auto&& fn,
   ResidualLoopPolicyType residualLoopPolicy = ScalarResidualLoop)
 {
   size_t i_end = end - start;
-  constexpr auto endOffset = residualLoopPolicy == ScalarResidualLoop ? 1 : SimdSize;
-  index<SimdSize, size_t> i{0};
-  for (; i.index_ + SimdSize < i_end + endOffset; i.index_ += SimdSize)
+  index<SimdModel, size_t> i{0};
+  const auto simdSize = i.size();
+  const auto endOffset = residualLoopPolicy == ScalarResidualLoop ? 1 : simdSize;
+  for (; i.index_ + simdSize < i_end + endOffset; i.index_ += simdSize)
   {
-    stdx::fixed_size_simd<std::decay_t<decltype(*start)>, SimdSize> simd_i([&](auto j)
-      { return *(start + i.index_ + j); });
+    using SimdIndexType = stdx::rebind_simd_t<std::decay_t<decltype(*start)>, SimdModel>;
+    SimdIndexType simd_i([&](auto j) { return *(start + i.index_ + j); });
     if constexpr (sizeof...(Args) == 0)
     {
       fn(i, simd_i);
@@ -3244,7 +3407,7 @@ namespace simd_access
 {
 
 /// Forward declaration
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct universal_simd;
 
 template<typename T>
@@ -3258,44 +3421,45 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
   stdx_simd<PotentialSimdType> ||
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, int SimdSize>(universal_simd<T, SimdSize>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x)
+    { []<class T, class SimdModel>(universal_simd<T, SimdModel>&){}(x); };
 
 /// Helper class to auto-generate either a `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct auto_simd
 {
   /// Universal simd type.
-  using type = universal_simd<T, SimdSize>;
+  using type = universal_simd<T, SimdModel>;
 };
 
 /// Specialization of \ref auto_simd for the `stdx::simd` variant,
 /**
  * @tparam T Arithmetic value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<simd_arithmetic T, int SimdSize>
-struct auto_simd<T, SimdSize>
+template<simd_arithmetic T, class SimdModel>
+struct auto_simd<T, SimdModel>
 {
   /// stdx::simd type.
-  using type = stdx::fixed_size_simd<T, SimdSize>;
+  using type = stdx::rebind_simd_t<T, SimdModel>;
 };
 
 /// Type which resolves either to `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type. If arithmetic, the resulting type is a `stdx::simd`. Otherwise it is a `universal_simd`.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
-using auto_simd_t = typename auto_simd<T, SimdSize>::type;
+template<class T, class SimdModel>
+using auto_simd_t = typename auto_simd<T, SimdModel>::type;
 
 } //namespace simd_access
 
@@ -3319,13 +3483,15 @@ namespace simd_access
 /// Specifies a location for a simd variable stored in memory as a consecutive sequence of elements.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct linear_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to the first element of the sequence.
   T* base_;
 
@@ -3337,7 +3503,7 @@ struct linear_location
   template<auto Member>
   auto member_access() const
   {
-    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize>{&(base_->*Member)};
+    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel>{&(base_->*Member)};
   }
 
   /// Creation of a linear location for an element of `T`, if `T` is an array.
@@ -3347,21 +3513,23 @@ struct linear_location
    */
   auto array_access(auto i) const
   {
-    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize>{&((*base_)[i])};
+    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel>{&((*base_)[i])};
   }
 };
 
 /// Specifies a location for a simd variable with the indices of its values stored in an array.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ArrayType Type of the array, which stores the indices.
  */
-template<class T, int SimdSize, class ArrayType>
+template<class T, class SimdModel, class ArrayType>
 struct indexed_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to element zero of the sequence.
   T* base_;
   /// Reference to the index array.
@@ -3375,7 +3543,7 @@ struct indexed_location
   template<auto Member>
   auto member_access() const
   {
-    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel, ArrayType>
       {&(base_->*Member), indices_};
   }
 
@@ -3386,7 +3554,7 @@ struct indexed_location
    */
   auto array_access(auto i) const
   {
-    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel, ArrayType>
       {&((*base_)[i]), indices_};
   }
 };
@@ -3426,7 +3594,7 @@ namespace simd_access
 {
 
 /// Forward declaration
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct universal_simd;
 
 template<typename T>
@@ -3440,44 +3608,45 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
   stdx_simd<PotentialSimdType> ||
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, int SimdSize>(universal_simd<T, SimdSize>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x)
+    { []<class T, class SimdModel>(universal_simd<T, SimdModel>&){}(x); };
 
 /// Helper class to auto-generate either a `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct auto_simd
 {
   /// Universal simd type.
-  using type = universal_simd<T, SimdSize>;
+  using type = universal_simd<T, SimdModel>;
 };
 
 /// Specialization of \ref auto_simd for the `stdx::simd` variant,
 /**
  * @tparam T Arithmetic value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<simd_arithmetic T, int SimdSize>
-struct auto_simd<T, SimdSize>
+template<simd_arithmetic T, class SimdModel>
+struct auto_simd<T, SimdModel>
 {
   /// stdx::simd type.
-  using type = stdx::fixed_size_simd<T, SimdSize>;
+  using type = stdx::rebind_simd_t<T, SimdModel>;
 };
 
 /// Type which resolves either to `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type. If arithmetic, the resulting type is a `stdx::simd`. Otherwise it is a `universal_simd`.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
-using auto_simd_t = typename auto_simd<T, SimdSize>::type;
+template<class T, class SimdModel>
+using auto_simd_t = typename auto_simd<T, SimdModel>::type;
 
 } //namespace simd_access
 
@@ -3501,13 +3670,15 @@ namespace simd_access
 /// Specifies a location for a simd variable stored in memory as a consecutive sequence of elements.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct linear_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to the first element of the sequence.
   T* base_;
 
@@ -3519,7 +3690,7 @@ struct linear_location
   template<auto Member>
   auto member_access() const
   {
-    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize>{&(base_->*Member)};
+    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel>{&(base_->*Member)};
   }
 
   /// Creation of a linear location for an element of `T`, if `T` is an array.
@@ -3529,21 +3700,23 @@ struct linear_location
    */
   auto array_access(auto i) const
   {
-    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize>{&((*base_)[i])};
+    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel>{&((*base_)[i])};
   }
 };
 
 /// Specifies a location for a simd variable with the indices of its values stored in an array.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ArrayType Type of the array, which stores the indices.
  */
-template<class T, int SimdSize, class ArrayType>
+template<class T, class SimdModel, class ArrayType>
 struct indexed_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to element zero of the sequence.
   T* base_;
   /// Reference to the index array.
@@ -3557,7 +3730,7 @@ struct indexed_location
   template<auto Member>
   auto member_access() const
   {
-    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel, ArrayType>
       {&(base_->*Member), indices_};
   }
 
@@ -3568,7 +3741,7 @@ struct indexed_location
    */
   auto array_access(auto i) const
   {
-    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel, ArrayType>
       {&((*base_)[i]), indices_};
   }
 };
@@ -3585,17 +3758,20 @@ class value_access;
 
 /// Class representing a simd index to a consecutive sequence of elements.
 /**
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam IndexType Type of the scalar index.
  */
-template<int SimdSize, class IndexType = size_t>
+template<class SimdModel, class IndexType = size_t>
 struct index
 {
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
+
   /// Return the length of the simd sequence.
   /**
    * @return The length of the simd sequence.
    */
-  static constexpr int size() { return SimdSize; }
+  static auto size() { return SimdModel::size(); }
 
   /// Return the scalar index of a vector lane.
   /**
@@ -3616,7 +3792,7 @@ struct index
   template<class T>
   auto operator[](T* data) const
   {
-    return value_access<linear_location<T, SimdSize>, sizeof(T)>(linear_location<T, SimdSize>{data + index_});
+    return value_access<linear_location<T, SimdModel>, sizeof(T)>(linear_location<T, SimdModel>{data + index_});
   }
 
   /// Transforms this to a simd value.
@@ -3625,27 +3801,27 @@ struct index
    */
   auto to_simd() const
   {
-    return stdx::fixed_size_simd<IndexType, SimdSize>([this](auto i){ return IndexType(index_ + i); });
+    return stdx::rebind_simd_t<IndexType, SimdModel>([this](auto i){ return IndexType(index_ + i); });
   }
 };
 
 template<class PotentialIndexType>
 concept simd_index =
   (stdx_simd<PotentialIndexType> && std::is_integral_v<typename PotentialIndexType::value_type>) ||
-  requires(std::remove_cvref_t<PotentialIndexType> x) { []<int SimdSize, class IndexType>(index<SimdSize, IndexType>&){}(x); };
+  requires(std::remove_cvref_t<PotentialIndexType> x) { []<class SimdModel, class IndexType>(index<SimdModel, IndexType>&){}(x); };
 
 /// TODO: Introduce masked_index to support e.g. residual masked loops.
 
 /// Returns the scalar index of a specific vector lane for a linear index.
 /**
- * @tparam SimdSize Deduced simd size.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam IndexType Deduced type of the scalar index.
  * @param idx Linear simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx.start + i`.
  */
-template<int SimdSize, class IndexType>
-inline auto scalar_index(const index<SimdSize, IndexType>& idx, auto i)
+template<class SimdModel, class IndexType>
+inline auto scalar_index(const index<SimdModel, IndexType>& idx, auto i)
 {
   return idx.scalar_index(i);
 }
@@ -3666,16 +3842,31 @@ inline auto scalar_index(const stdx::simd<IndexType, SimdModel>& idx, auto i)
 
 /// Returns true, if the argument is a simd index (i.e. fullfills the concept `simd_index`).
 /**
- * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam SimdModel Deduced abi of the `simd` paramter.
- * @param idx Indirect simd index.
- * @param i Vector lane.
- * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
+ * @param idx Potential simd index.
+ * @return True, if the type of idx fulfills `simd_index` concept.
  */
- constexpr inline auto is_simd_index(auto&& idx)
+constexpr inline auto is_simd_index(auto&& idx)
 {
   return simd_index<decltype(idx)>;
 }
+
+template<class T>
+struct index_model;
+
+template<class SimdModel, class IndexType>
+struct index_model<index<SimdModel, IndexType>>
+{
+  using type = SimdModel;
+};
+
+template<std::integral Index, class Abi>
+struct index_model<stdx::simd<Index, Abi>>
+{
+  using type = stdx::simd<Index, Abi>;
+};
+
+template<simd_index T>
+using index_model_t = typename index_model<T>::type;
 
 } //namespace simd_access
 
@@ -3712,17 +3903,17 @@ inline void simd_members(FN&& func, typename SrcType::value_type& d, const SrcTy
   func(d, s);
 }
 
-template<int SimdSize, simd_arithmetic T>
+template<class SimdModel, simd_arithmetic T>
 inline auto simdized_value(T)
 {
-  return stdx::fixed_size_simd<T, SimdSize>();
+  return stdx::rebind_simd_t<T, SimdModel>();
 }
 
 // overloads for std types, which can't be added after the template definition, since ADL wouldn't found it
-template<int SimdSize, class T>
+template<class SimdModel, class T>
 inline auto simdized_value(const std::vector<T>& v)
 {
-  std::vector<decltype(simdized_value<SimdSize>(std::declval<T>()))> result(v.size());
+  std::vector<decltype(simdized_value<SimdModel>(std::declval<T>()))> result(v.size());
   return result;
 }
 
@@ -3736,10 +3927,10 @@ inline void simd_members(auto&& func, Args&&... values)
   }
 }
 
-template<int SimdSize, class T, class U>
+template<class SimdModel, class T, class U>
 inline auto simdized_value(const std::pair<T, U>& v)
 {
-  return std::make_pair(simdized_value<SimdSize>(v.first), simdized_value<SimdSize>(v.second));
+  return std::make_pair(simdized_value<SimdModel>(v.first), simdized_value<SimdModel>(v.second));
 }
 
 template<simd_access::specialization_of<std::pair>... Args>
@@ -3756,18 +3947,18 @@ inline void simd_members(auto&& func, Args&&... values)
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Deduced type of the scalar structure, of which `SimdSize` number of objects will be combined in a
  *   structure-of-simd.
- * @tparam SimdSize Deduced vector size of the simd type.
+ * @tparam SimdModel Simd type acting as type model.
  * @param location Address of the memory location, at which the first scalar element is stored.
  * @return A simd value.
  */
-template<size_t ElementSize, class T, int SimdSize>
+template<size_t ElementSize, class T, class SimdModel>
   requires (!simd_arithmetic<T>)
-inline auto load(const linear_location<T, SimdSize>& location)
+inline auto load(const linear_location<T, SimdModel>& location)
 {
-  auto result = simdized_value<SimdSize>(*location.base_);
+  auto result = simdized_value<SimdModel>(*location.base_);
   simd_members([&](auto&& dest, auto&& src)
     {
-      dest = load<ElementSize>(linear_location<std::remove_reference_t<decltype(src)>, SimdSize>{&src});
+      dest = load<ElementSize>(linear_location<std::remove_reference_t<decltype(src)>, SimdModel>{&src});
     },
     result, *location.base_);
   return result;
@@ -3788,7 +3979,7 @@ template<class BaseType, simd_index IndexType>
   requires (!simd_arithmetic<BaseType>)
 inline auto load_rvalue(auto&& base, const IndexType& idx, auto&& subobject)
 {
-  decltype(simdized_value<IndexType::size()>(std::declval<BaseType>())) result;
+  decltype(simdized_value<index_model_t<IndexType>>(std::declval<BaseType>())) result;
   for (decltype(idx.size()) i = 0, e = idx.size(); i < e; ++i)
   {
     simd_members([&](auto&& dest, auto&& src)
@@ -3813,7 +4004,7 @@ template<class BaseType, simd_index IndexType>
   requires (!simd_arithmetic<BaseType>)
 inline auto load_rvalue(auto&& base, const IndexType& idx)
 {
-  decltype(simdized_value<IndexType::size()>(std::declval<BaseType>())) result;
+  decltype(simdized_value<index_model_t<IndexType>>(std::declval<BaseType>())) result;
   for (decltype(idx.size()) i = 0, e = idx.size(); i < e; ++i)
   {
     simd_members([&](auto&& dest, auto&& src)
@@ -3831,20 +4022,20 @@ inline auto load_rvalue(auto&& base, const IndexType& idx)
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Deduced type of the scalar structure, of which `SimdSize`number of objects are combined in a
  *   structure-of-simd.
- * @tparam SimdSize Deduced vector size of the simd type.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ExprType Deduced type of the source expression.
  * @param location Address of the memory location, to which the first scalar element is about to be stored.
  * @param expr The expression, whose result is stored. Must be convertible to a structure-of-simd.
  */
-template<size_t ElementSize, class T, class ExprType, int SimdSize>
+template<size_t ElementSize, class T, class ExprType, class SimdModel>
   requires (!simd_arithmetic<T>)
-inline void store(const linear_location<T, SimdSize>& location, const ExprType& expr)
+inline void store(const linear_location<T, SimdModel>& location, const ExprType& expr)
 {
-  const decltype(simdized_value<SimdSize>(std::declval<T>()))& source = expr;
+  const decltype(simdized_value<SimdModel>(std::declval<T>()))& source = expr;
   simd_members([&](auto&& dest, auto&& src)
     {
       store<ElementSize>(
-        linear_location<std::remove_reference_t<decltype(dest)>, SimdSize>{&dest}, src);
+        linear_location<std::remove_reference_t<decltype(dest)>, SimdModel>{&dest}, src);
     },
     *location.base_, source);
 }
@@ -3855,19 +4046,19 @@ inline void store(const linear_location<T, SimdSize>& location, const ExprType& 
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Deduced type of the scalar structure, of which `SimdSize` number of objects will be combined in a
  *   structure-of-simd.
- * @tparam SimdSize Deduced vector size of the simd type.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ArrayType Deduced type of the array storing the indices.
  * @param location Address and indices of the memory location.
  * @return A simd value.
  */
-template<size_t ElementSize, class T, int SimdSize, class IndexArray>
+template<size_t ElementSize, class T, class SimdModel, class IndexArray>
   requires (!simd_arithmetic<T>)
-inline auto load(const indexed_location<T, SimdSize, IndexArray>& location)
+inline auto load(const indexed_location<T, SimdModel, IndexArray>& location)
 {
-  auto result = simdized_value<SimdSize>(*location.base_);
+  auto result = simdized_value<SimdModel>(*location.base_);
   simd_members([&](auto&& dest, auto&& src)
     {
-      dest = load<ElementSize>(indexed_location<std::remove_reference_t<decltype(src)>, SimdSize, IndexArray>{
+      dest = load<ElementSize>(indexed_location<std::remove_reference_t<decltype(src)>, SimdModel, IndexArray>{
         &src, location.indices_});
     },
     result, *location.base_);
@@ -3880,20 +4071,20 @@ inline auto load(const indexed_location<T, SimdSize, IndexArray>& location)
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Deduced type of the scalar structure, of which `SimdSize`number of objects are combined in a
  *   structure-of-simd.
- * @tparam SimdSize Deduced vector size of the simd type.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ArrayType Deduced type of the array storing the indices.
  * @tparam ExprType Deduced type of the source expression.
  * @param location Address and indices of the memory location.
  * @param expr The expression, whose result is stored. Must be convertible to a structure-of-simd.
  */
-template<size_t ElementSize, class T, class ExprType, int SimdSize, class IndexArray>
+template<size_t ElementSize, class T, class ExprType, class SimdModel, class IndexArray>
   requires (!simd_arithmetic<T>)
-inline void store(const indexed_location<T, SimdSize, IndexArray>& location, const ExprType& expr)
+inline void store(const indexed_location<T, SimdModel, IndexArray>& location, const ExprType& expr)
 {
-  const decltype(simdized_value<SimdSize>(std::declval<T>()))& source = expr;
+  const decltype(simdized_value<SimdModel>(std::declval<T>()))& source = expr;
   simd_members([&](auto&& dest, auto&& src)
     {
-      using location_type = indexed_location<std::remove_reference_t<decltype(dest)>, SimdSize, IndexArray>;
+      using location_type = indexed_location<std::remove_reference_t<decltype(dest)>, SimdModel, IndexArray>;
       store<ElementSize>(location_type{&dest, location.indices_}, src);
     }, *location.base_, source);
 }
@@ -3985,7 +4176,7 @@ namespace simd_access
 {
 
 /// Forward declaration
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct universal_simd;
 
 template<typename T>
@@ -3999,44 +4190,45 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
   stdx_simd<PotentialSimdType> ||
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, int SimdSize>(universal_simd<T, SimdSize>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x)
+    { []<class T, class SimdModel>(universal_simd<T, SimdModel>&){}(x); };
 
 /// Helper class to auto-generate either a `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct auto_simd
 {
   /// Universal simd type.
-  using type = universal_simd<T, SimdSize>;
+  using type = universal_simd<T, SimdModel>;
 };
 
 /// Specialization of \ref auto_simd for the `stdx::simd` variant,
 /**
  * @tparam T Arithmetic value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<simd_arithmetic T, int SimdSize>
-struct auto_simd<T, SimdSize>
+template<simd_arithmetic T, class SimdModel>
+struct auto_simd<T, SimdModel>
 {
   /// stdx::simd type.
-  using type = stdx::fixed_size_simd<T, SimdSize>;
+  using type = stdx::rebind_simd_t<T, SimdModel>;
 };
 
 /// Type which resolves either to `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type. If arithmetic, the resulting type is a `stdx::simd`. Otherwise it is a `universal_simd`.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
-using auto_simd_t = typename auto_simd<T, SimdSize>::type;
+template<class T, class SimdModel>
+using auto_simd_t = typename auto_simd<T, SimdModel>::type;
 
 } //namespace simd_access
 
@@ -4073,7 +4265,7 @@ namespace simd_access
 {
 
 /// Forward declaration
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct universal_simd;
 
 template<typename T>
@@ -4087,44 +4279,45 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
   stdx_simd<PotentialSimdType> ||
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, int SimdSize>(universal_simd<T, SimdSize>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x)
+    { []<class T, class SimdModel>(universal_simd<T, SimdModel>&){}(x); };
 
 /// Helper class to auto-generate either a `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct auto_simd
 {
   /// Universal simd type.
-  using type = universal_simd<T, SimdSize>;
+  using type = universal_simd<T, SimdModel>;
 };
 
 /// Specialization of \ref auto_simd for the `stdx::simd` variant,
 /**
  * @tparam T Arithmetic value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<simd_arithmetic T, int SimdSize>
-struct auto_simd<T, SimdSize>
+template<simd_arithmetic T, class SimdModel>
+struct auto_simd<T, SimdModel>
 {
   /// stdx::simd type.
-  using type = stdx::fixed_size_simd<T, SimdSize>;
+  using type = stdx::rebind_simd_t<T, SimdModel>;
 };
 
 /// Type which resolves either to `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type. If arithmetic, the resulting type is a `stdx::simd`. Otherwise it is a `universal_simd`.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
-using auto_simd_t = typename auto_simd<T, SimdSize>::type;
+template<class T, class SimdModel>
+using auto_simd_t = typename auto_simd<T, SimdModel>::type;
 
 } //namespace simd_access
 
@@ -4148,13 +4341,15 @@ namespace simd_access
 /// Specifies a location for a simd variable stored in memory as a consecutive sequence of elements.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct linear_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to the first element of the sequence.
   T* base_;
 
@@ -4166,7 +4361,7 @@ struct linear_location
   template<auto Member>
   auto member_access() const
   {
-    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize>{&(base_->*Member)};
+    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel>{&(base_->*Member)};
   }
 
   /// Creation of a linear location for an element of `T`, if `T` is an array.
@@ -4176,21 +4371,23 @@ struct linear_location
    */
   auto array_access(auto i) const
   {
-    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize>{&((*base_)[i])};
+    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel>{&((*base_)[i])};
   }
 };
 
 /// Specifies a location for a simd variable with the indices of its values stored in an array.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ArrayType Type of the array, which stores the indices.
  */
-template<class T, int SimdSize, class ArrayType>
+template<class T, class SimdModel, class ArrayType>
 struct indexed_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to element zero of the sequence.
   T* base_;
   /// Reference to the index array.
@@ -4204,7 +4401,7 @@ struct indexed_location
   template<auto Member>
   auto member_access() const
   {
-    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel, ArrayType>
       {&(base_->*Member), indices_};
   }
 
@@ -4215,7 +4412,7 @@ struct indexed_location
    */
   auto array_access(auto i) const
   {
-    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel, ArrayType>
       {&((*base_)[i]), indices_};
   }
 };
@@ -4232,17 +4429,20 @@ class value_access;
 
 /// Class representing a simd index to a consecutive sequence of elements.
 /**
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam IndexType Type of the scalar index.
  */
-template<int SimdSize, class IndexType = size_t>
+template<class SimdModel, class IndexType = size_t>
 struct index
 {
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
+
   /// Return the length of the simd sequence.
   /**
    * @return The length of the simd sequence.
    */
-  static constexpr int size() { return SimdSize; }
+  static auto size() { return SimdModel::size(); }
 
   /// Return the scalar index of a vector lane.
   /**
@@ -4263,7 +4463,7 @@ struct index
   template<class T>
   auto operator[](T* data) const
   {
-    return value_access<linear_location<T, SimdSize>, sizeof(T)>(linear_location<T, SimdSize>{data + index_});
+    return value_access<linear_location<T, SimdModel>, sizeof(T)>(linear_location<T, SimdModel>{data + index_});
   }
 
   /// Transforms this to a simd value.
@@ -4272,27 +4472,27 @@ struct index
    */
   auto to_simd() const
   {
-    return stdx::fixed_size_simd<IndexType, SimdSize>([this](auto i){ return IndexType(index_ + i); });
+    return stdx::rebind_simd_t<IndexType, SimdModel>([this](auto i){ return IndexType(index_ + i); });
   }
 };
 
 template<class PotentialIndexType>
 concept simd_index =
   (stdx_simd<PotentialIndexType> && std::is_integral_v<typename PotentialIndexType::value_type>) ||
-  requires(std::remove_cvref_t<PotentialIndexType> x) { []<int SimdSize, class IndexType>(index<SimdSize, IndexType>&){}(x); };
+  requires(std::remove_cvref_t<PotentialIndexType> x) { []<class SimdModel, class IndexType>(index<SimdModel, IndexType>&){}(x); };
 
 /// TODO: Introduce masked_index to support e.g. residual masked loops.
 
 /// Returns the scalar index of a specific vector lane for a linear index.
 /**
- * @tparam SimdSize Deduced simd size.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam IndexType Deduced type of the scalar index.
  * @param idx Linear simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx.start + i`.
  */
-template<int SimdSize, class IndexType>
-inline auto scalar_index(const index<SimdSize, IndexType>& idx, auto i)
+template<class SimdModel, class IndexType>
+inline auto scalar_index(const index<SimdModel, IndexType>& idx, auto i)
 {
   return idx.scalar_index(i);
 }
@@ -4313,16 +4513,31 @@ inline auto scalar_index(const stdx::simd<IndexType, SimdModel>& idx, auto i)
 
 /// Returns true, if the argument is a simd index (i.e. fullfills the concept `simd_index`).
 /**
- * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam SimdModel Deduced abi of the `simd` paramter.
- * @param idx Indirect simd index.
- * @param i Vector lane.
- * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
+ * @param idx Potential simd index.
+ * @return True, if the type of idx fulfills `simd_index` concept.
  */
- constexpr inline auto is_simd_index(auto&& idx)
+constexpr inline auto is_simd_index(auto&& idx)
 {
   return simd_index<decltype(idx)>;
 }
+
+template<class T>
+struct index_model;
+
+template<class SimdModel, class IndexType>
+struct index_model<index<SimdModel, IndexType>>
+{
+  using type = SimdModel;
+};
+
+template<std::integral Index, class Abi>
+struct index_model<stdx::simd<Index, Abi>>
+{
+  using type = stdx::simd<Index, Abi>;
+};
+
+template<simd_index T>
+using index_model_t = typename index_model<T>::type;
 
 } //namespace simd_access
 
@@ -4366,7 +4581,7 @@ namespace simd_access
 {
 
 /// Forward declaration
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct universal_simd;
 
 template<typename T>
@@ -4380,44 +4595,45 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
   stdx_simd<PotentialSimdType> ||
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, int SimdSize>(universal_simd<T, SimdSize>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x)
+    { []<class T, class SimdModel>(universal_simd<T, SimdModel>&){}(x); };
 
 /// Helper class to auto-generate either a `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct auto_simd
 {
   /// Universal simd type.
-  using type = universal_simd<T, SimdSize>;
+  using type = universal_simd<T, SimdModel>;
 };
 
 /// Specialization of \ref auto_simd for the `stdx::simd` variant,
 /**
  * @tparam T Arithmetic value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<simd_arithmetic T, int SimdSize>
-struct auto_simd<T, SimdSize>
+template<simd_arithmetic T, class SimdModel>
+struct auto_simd<T, SimdModel>
 {
   /// stdx::simd type.
-  using type = stdx::fixed_size_simd<T, SimdSize>;
+  using type = stdx::rebind_simd_t<T, SimdModel>;
 };
 
 /// Type which resolves either to `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type. If arithmetic, the resulting type is a `stdx::simd`. Otherwise it is a `universal_simd`.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
-using auto_simd_t = typename auto_simd<T, SimdSize>::type;
+template<class T, class SimdModel>
+using auto_simd_t = typename auto_simd<T, SimdModel>::type;
 
 } //namespace simd_access
 
@@ -4441,13 +4657,15 @@ namespace simd_access
 /// Specifies a location for a simd variable stored in memory as a consecutive sequence of elements.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct linear_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to the first element of the sequence.
   T* base_;
 
@@ -4459,7 +4677,7 @@ struct linear_location
   template<auto Member>
   auto member_access() const
   {
-    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize>{&(base_->*Member)};
+    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel>{&(base_->*Member)};
   }
 
   /// Creation of a linear location for an element of `T`, if `T` is an array.
@@ -4469,21 +4687,23 @@ struct linear_location
    */
   auto array_access(auto i) const
   {
-    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize>{&((*base_)[i])};
+    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel>{&((*base_)[i])};
   }
 };
 
 /// Specifies a location for a simd variable with the indices of its values stored in an array.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ArrayType Type of the array, which stores the indices.
  */
-template<class T, int SimdSize, class ArrayType>
+template<class T, class SimdModel, class ArrayType>
 struct indexed_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to element zero of the sequence.
   T* base_;
   /// Reference to the index array.
@@ -4497,7 +4717,7 @@ struct indexed_location
   template<auto Member>
   auto member_access() const
   {
-    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel, ArrayType>
       {&(base_->*Member), indices_};
   }
 
@@ -4508,7 +4728,7 @@ struct indexed_location
    */
   auto array_access(auto i) const
   {
-    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel, ArrayType>
       {&((*base_)[i]), indices_};
   }
 };
@@ -4548,7 +4768,7 @@ namespace simd_access
 {
 
 /// Forward declaration
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct universal_simd;
 
 template<typename T>
@@ -4562,44 +4782,45 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
   stdx_simd<PotentialSimdType> ||
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, int SimdSize>(universal_simd<T, SimdSize>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x)
+    { []<class T, class SimdModel>(universal_simd<T, SimdModel>&){}(x); };
 
 /// Helper class to auto-generate either a `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct auto_simd
 {
   /// Universal simd type.
-  using type = universal_simd<T, SimdSize>;
+  using type = universal_simd<T, SimdModel>;
 };
 
 /// Specialization of \ref auto_simd for the `stdx::simd` variant,
 /**
  * @tparam T Arithmetic value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<simd_arithmetic T, int SimdSize>
-struct auto_simd<T, SimdSize>
+template<simd_arithmetic T, class SimdModel>
+struct auto_simd<T, SimdModel>
 {
   /// stdx::simd type.
-  using type = stdx::fixed_size_simd<T, SimdSize>;
+  using type = stdx::rebind_simd_t<T, SimdModel>;
 };
 
 /// Type which resolves either to `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type. If arithmetic, the resulting type is a `stdx::simd`. Otherwise it is a `universal_simd`.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
-using auto_simd_t = typename auto_simd<T, SimdSize>::type;
+template<class T, class SimdModel>
+using auto_simd_t = typename auto_simd<T, SimdModel>::type;
 
 } //namespace simd_access
 
@@ -4623,13 +4844,15 @@ namespace simd_access
 /// Specifies a location for a simd variable stored in memory as a consecutive sequence of elements.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct linear_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to the first element of the sequence.
   T* base_;
 
@@ -4641,7 +4864,7 @@ struct linear_location
   template<auto Member>
   auto member_access() const
   {
-    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize>{&(base_->*Member)};
+    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel>{&(base_->*Member)};
   }
 
   /// Creation of a linear location for an element of `T`, if `T` is an array.
@@ -4651,21 +4874,23 @@ struct linear_location
    */
   auto array_access(auto i) const
   {
-    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize>{&((*base_)[i])};
+    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel>{&((*base_)[i])};
   }
 };
 
 /// Specifies a location for a simd variable with the indices of its values stored in an array.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ArrayType Type of the array, which stores the indices.
  */
-template<class T, int SimdSize, class ArrayType>
+template<class T, class SimdModel, class ArrayType>
 struct indexed_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to element zero of the sequence.
   T* base_;
   /// Reference to the index array.
@@ -4679,7 +4904,7 @@ struct indexed_location
   template<auto Member>
   auto member_access() const
   {
-    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel, ArrayType>
       {&(base_->*Member), indices_};
   }
 
@@ -4690,7 +4915,7 @@ struct indexed_location
    */
   auto array_access(auto i) const
   {
-    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel, ArrayType>
       {&((*base_)[i]), indices_};
   }
 };
@@ -4707,17 +4932,20 @@ class value_access;
 
 /// Class representing a simd index to a consecutive sequence of elements.
 /**
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam IndexType Type of the scalar index.
  */
-template<int SimdSize, class IndexType = size_t>
+template<class SimdModel, class IndexType = size_t>
 struct index
 {
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
+
   /// Return the length of the simd sequence.
   /**
    * @return The length of the simd sequence.
    */
-  static constexpr int size() { return SimdSize; }
+  static auto size() { return SimdModel::size(); }
 
   /// Return the scalar index of a vector lane.
   /**
@@ -4738,7 +4966,7 @@ struct index
   template<class T>
   auto operator[](T* data) const
   {
-    return value_access<linear_location<T, SimdSize>, sizeof(T)>(linear_location<T, SimdSize>{data + index_});
+    return value_access<linear_location<T, SimdModel>, sizeof(T)>(linear_location<T, SimdModel>{data + index_});
   }
 
   /// Transforms this to a simd value.
@@ -4747,27 +4975,27 @@ struct index
    */
   auto to_simd() const
   {
-    return stdx::fixed_size_simd<IndexType, SimdSize>([this](auto i){ return IndexType(index_ + i); });
+    return stdx::rebind_simd_t<IndexType, SimdModel>([this](auto i){ return IndexType(index_ + i); });
   }
 };
 
 template<class PotentialIndexType>
 concept simd_index =
   (stdx_simd<PotentialIndexType> && std::is_integral_v<typename PotentialIndexType::value_type>) ||
-  requires(std::remove_cvref_t<PotentialIndexType> x) { []<int SimdSize, class IndexType>(index<SimdSize, IndexType>&){}(x); };
+  requires(std::remove_cvref_t<PotentialIndexType> x) { []<class SimdModel, class IndexType>(index<SimdModel, IndexType>&){}(x); };
 
 /// TODO: Introduce masked_index to support e.g. residual masked loops.
 
 /// Returns the scalar index of a specific vector lane for a linear index.
 /**
- * @tparam SimdSize Deduced simd size.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam IndexType Deduced type of the scalar index.
  * @param idx Linear simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx.start + i`.
  */
-template<int SimdSize, class IndexType>
-inline auto scalar_index(const index<SimdSize, IndexType>& idx, auto i)
+template<class SimdModel, class IndexType>
+inline auto scalar_index(const index<SimdModel, IndexType>& idx, auto i)
 {
   return idx.scalar_index(i);
 }
@@ -4788,16 +5016,31 @@ inline auto scalar_index(const stdx::simd<IndexType, SimdModel>& idx, auto i)
 
 /// Returns true, if the argument is a simd index (i.e. fullfills the concept `simd_index`).
 /**
- * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam SimdModel Deduced abi of the `simd` paramter.
- * @param idx Indirect simd index.
- * @param i Vector lane.
- * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
+ * @param idx Potential simd index.
+ * @return True, if the type of idx fulfills `simd_index` concept.
  */
- constexpr inline auto is_simd_index(auto&& idx)
+constexpr inline auto is_simd_index(auto&& idx)
 {
   return simd_index<decltype(idx)>;
 }
+
+template<class T>
+struct index_model;
+
+template<class SimdModel, class IndexType>
+struct index_model<index<SimdModel, IndexType>>
+{
+  using type = SimdModel;
+};
+
+template<std::integral Index, class Abi>
+struct index_model<stdx::simd<Index, Abi>>
+{
+  using type = stdx::simd<Index, Abi>;
+};
+
+template<simd_index T>
+using index_model_t = typename index_model<T>::type;
 
 } //namespace simd_access
 
@@ -4834,17 +5077,17 @@ inline void simd_members(FN&& func, typename SrcType::value_type& d, const SrcTy
   func(d, s);
 }
 
-template<int SimdSize, simd_arithmetic T>
+template<class SimdModel, simd_arithmetic T>
 inline auto simdized_value(T)
 {
-  return stdx::fixed_size_simd<T, SimdSize>();
+  return stdx::rebind_simd_t<T, SimdModel>();
 }
 
 // overloads for std types, which can't be added after the template definition, since ADL wouldn't found it
-template<int SimdSize, class T>
+template<class SimdModel, class T>
 inline auto simdized_value(const std::vector<T>& v)
 {
-  std::vector<decltype(simdized_value<SimdSize>(std::declval<T>()))> result(v.size());
+  std::vector<decltype(simdized_value<SimdModel>(std::declval<T>()))> result(v.size());
   return result;
 }
 
@@ -4858,10 +5101,10 @@ inline void simd_members(auto&& func, Args&&... values)
   }
 }
 
-template<int SimdSize, class T, class U>
+template<class SimdModel, class T, class U>
 inline auto simdized_value(const std::pair<T, U>& v)
 {
-  return std::make_pair(simdized_value<SimdSize>(v.first), simdized_value<SimdSize>(v.second));
+  return std::make_pair(simdized_value<SimdModel>(v.first), simdized_value<SimdModel>(v.second));
 }
 
 template<simd_access::specialization_of<std::pair>... Args>
@@ -4878,18 +5121,18 @@ inline void simd_members(auto&& func, Args&&... values)
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Deduced type of the scalar structure, of which `SimdSize` number of objects will be combined in a
  *   structure-of-simd.
- * @tparam SimdSize Deduced vector size of the simd type.
+ * @tparam SimdModel Simd type acting as type model.
  * @param location Address of the memory location, at which the first scalar element is stored.
  * @return A simd value.
  */
-template<size_t ElementSize, class T, int SimdSize>
+template<size_t ElementSize, class T, class SimdModel>
   requires (!simd_arithmetic<T>)
-inline auto load(const linear_location<T, SimdSize>& location)
+inline auto load(const linear_location<T, SimdModel>& location)
 {
-  auto result = simdized_value<SimdSize>(*location.base_);
+  auto result = simdized_value<SimdModel>(*location.base_);
   simd_members([&](auto&& dest, auto&& src)
     {
-      dest = load<ElementSize>(linear_location<std::remove_reference_t<decltype(src)>, SimdSize>{&src});
+      dest = load<ElementSize>(linear_location<std::remove_reference_t<decltype(src)>, SimdModel>{&src});
     },
     result, *location.base_);
   return result;
@@ -4910,7 +5153,7 @@ template<class BaseType, simd_index IndexType>
   requires (!simd_arithmetic<BaseType>)
 inline auto load_rvalue(auto&& base, const IndexType& idx, auto&& subobject)
 {
-  decltype(simdized_value<IndexType::size()>(std::declval<BaseType>())) result;
+  decltype(simdized_value<index_model_t<IndexType>>(std::declval<BaseType>())) result;
   for (decltype(idx.size()) i = 0, e = idx.size(); i < e; ++i)
   {
     simd_members([&](auto&& dest, auto&& src)
@@ -4935,7 +5178,7 @@ template<class BaseType, simd_index IndexType>
   requires (!simd_arithmetic<BaseType>)
 inline auto load_rvalue(auto&& base, const IndexType& idx)
 {
-  decltype(simdized_value<IndexType::size()>(std::declval<BaseType>())) result;
+  decltype(simdized_value<index_model_t<IndexType>>(std::declval<BaseType>())) result;
   for (decltype(idx.size()) i = 0, e = idx.size(); i < e; ++i)
   {
     simd_members([&](auto&& dest, auto&& src)
@@ -4953,20 +5196,20 @@ inline auto load_rvalue(auto&& base, const IndexType& idx)
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Deduced type of the scalar structure, of which `SimdSize`number of objects are combined in a
  *   structure-of-simd.
- * @tparam SimdSize Deduced vector size of the simd type.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ExprType Deduced type of the source expression.
  * @param location Address of the memory location, to which the first scalar element is about to be stored.
  * @param expr The expression, whose result is stored. Must be convertible to a structure-of-simd.
  */
-template<size_t ElementSize, class T, class ExprType, int SimdSize>
+template<size_t ElementSize, class T, class ExprType, class SimdModel>
   requires (!simd_arithmetic<T>)
-inline void store(const linear_location<T, SimdSize>& location, const ExprType& expr)
+inline void store(const linear_location<T, SimdModel>& location, const ExprType& expr)
 {
-  const decltype(simdized_value<SimdSize>(std::declval<T>()))& source = expr;
+  const decltype(simdized_value<SimdModel>(std::declval<T>()))& source = expr;
   simd_members([&](auto&& dest, auto&& src)
     {
       store<ElementSize>(
-        linear_location<std::remove_reference_t<decltype(dest)>, SimdSize>{&dest}, src);
+        linear_location<std::remove_reference_t<decltype(dest)>, SimdModel>{&dest}, src);
     },
     *location.base_, source);
 }
@@ -4977,19 +5220,19 @@ inline void store(const linear_location<T, SimdSize>& location, const ExprType& 
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Deduced type of the scalar structure, of which `SimdSize` number of objects will be combined in a
  *   structure-of-simd.
- * @tparam SimdSize Deduced vector size of the simd type.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ArrayType Deduced type of the array storing the indices.
  * @param location Address and indices of the memory location.
  * @return A simd value.
  */
-template<size_t ElementSize, class T, int SimdSize, class IndexArray>
+template<size_t ElementSize, class T, class SimdModel, class IndexArray>
   requires (!simd_arithmetic<T>)
-inline auto load(const indexed_location<T, SimdSize, IndexArray>& location)
+inline auto load(const indexed_location<T, SimdModel, IndexArray>& location)
 {
-  auto result = simdized_value<SimdSize>(*location.base_);
+  auto result = simdized_value<SimdModel>(*location.base_);
   simd_members([&](auto&& dest, auto&& src)
     {
-      dest = load<ElementSize>(indexed_location<std::remove_reference_t<decltype(src)>, SimdSize, IndexArray>{
+      dest = load<ElementSize>(indexed_location<std::remove_reference_t<decltype(src)>, SimdModel, IndexArray>{
         &src, location.indices_});
     },
     result, *location.base_);
@@ -5002,20 +5245,20 @@ inline auto load(const indexed_location<T, SimdSize, IndexArray>& location)
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Deduced type of the scalar structure, of which `SimdSize`number of objects are combined in a
  *   structure-of-simd.
- * @tparam SimdSize Deduced vector size of the simd type.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ArrayType Deduced type of the array storing the indices.
  * @tparam ExprType Deduced type of the source expression.
  * @param location Address and indices of the memory location.
  * @param expr The expression, whose result is stored. Must be convertible to a structure-of-simd.
  */
-template<size_t ElementSize, class T, class ExprType, int SimdSize, class IndexArray>
+template<size_t ElementSize, class T, class ExprType, class SimdModel, class IndexArray>
   requires (!simd_arithmetic<T>)
-inline void store(const indexed_location<T, SimdSize, IndexArray>& location, const ExprType& expr)
+inline void store(const indexed_location<T, SimdModel, IndexArray>& location, const ExprType& expr)
 {
-  const decltype(simdized_value<SimdSize>(std::declval<T>()))& source = expr;
+  const decltype(simdized_value<SimdModel>(std::declval<T>()))& source = expr;
   simd_members([&](auto&& dest, auto&& src)
     {
-      using location_type = indexed_location<std::remove_reference_t<decltype(dest)>, SimdSize, IndexArray>;
+      using location_type = indexed_location<std::remove_reference_t<decltype(dest)>, SimdModel, IndexArray>;
       store<ElementSize>(location_type{&dest, location.indices_}, src);
     }, *location.base_, source);
 }
@@ -5089,16 +5332,16 @@ namespace simd_access
 /// Universal simd class for non-arithmetic value types.
 /**
  * @tparam T Value type.
- * @tparam SimdSize Simd size (number of vector lanes).
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
-struct universal_simd : std::array<T, SimdSize>
+template<class T, class SimdModel>
+struct universal_simd : std::array<T, SimdModel::size()>
 {
   /// Static version of `size()` (as provided by `stdx::simd`, but not by `std::array`).
   /**
    * @return `SimdSize`
    */
-  static constexpr auto size() { return SimdSize; }
+  static constexpr auto size() { return SimdModel::size(); }
 
   /// Generator constructor (as provided by `stdx::simd`).
   /**
@@ -5109,10 +5352,10 @@ struct universal_simd : std::array<T, SimdSize>
    */
   template<class G>
   explicit universal_simd(G&& generator) :
-    std::array<T, SimdSize>([&]<int... I>(std::integer_sequence<int, I...>) -> std::array<T, SimdSize>
+    std::array<T, size()>([&]<int... I>(std::integer_sequence<int, I...>) -> std::array<T, size()>
       {
         return {{ generator(std::integral_constant<int, I>())... }};
-      } (std::make_integer_sequence<int, SimdSize>())) {}
+      } (std::make_integer_sequence<int, size()>())) {}
 
   /// Default constructor.
   universal_simd() = default;
@@ -5144,7 +5387,7 @@ template<class IndexType>
   requires(!std::integral<IndexType>)
 inline decltype(auto) generate_universal(const IndexType& idx, auto&& generator)
 {
-  return universal_simd<decltype(generator(scalar_index(idx, 0))), IndexType::size()>([&](auto i)
+  return universal_simd<decltype(generator(scalar_index(idx, 0))), index_model_t<IndexType>>([&](auto i)
     {
       return generator(scalar_index(idx, i));
     });
@@ -5168,22 +5411,21 @@ inline decltype(auto) universal_access(T&& v, Func&& subobject)
 /// Accesses a subobject (a member or a member function) of a universal simd value. Overloaded for scalar values.
 /**
  * @tparam T Deduced value type of the universal simd.
- * @tparam SimdSize Simd size (number of vector lanes).
+ * @tparam SimdModel Deduced simd type acting as type model.
  * @tparam Func Deduced type of the functor specifying the subobject.
  * @param v Simd value.
  * @param subobject Functor accessing the subobject of one entry in the simd value.
  * @return A simd value holding the result of the calls `subobject(v[i])` for each vector lane.
  */
-template<class T, int SimdSize, class Func>
-inline auto universal_access(const simd_access::universal_simd<T, SimdSize>& v, Func&& subobject)
+template<class T, class SimdModel, class Func>
+inline auto universal_access(const simd_access::universal_simd<T, SimdModel>& v, Func&& subobject)
 {
   using ScalarType = decltype(subobject(static_cast<const std::unwrap_reference_t<T>&>(v[0])));
-  decltype(simdized_value<SimdSize>(std::declval<ScalarType>())) result;
-  for (int i = 0; i < SimdSize; ++i)
+  decltype(simdized_value<SimdModel>(std::declval<ScalarType>())) result;
+  for (size_t i = 0; i < SimdModel::size(); ++i)
   {
-    simd_members([&](auto&& d, auto&& s)
-    { d[i] = s; },
-    result, subobject(static_cast<const std::unwrap_reference_t<T>&>(v[i])));
+    simd_members([&](auto&& d, auto&& s){ d[i] = s; },
+      result, subobject(static_cast<const std::unwrap_reference_t<T>&>(v[i])));
   }
   return result;
 }
@@ -5242,7 +5484,7 @@ namespace simd_access
 {
 
 /// Forward declaration
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct universal_simd;
 
 template<typename T>
@@ -5256,44 +5498,45 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
   stdx_simd<PotentialSimdType> ||
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, int SimdSize>(universal_simd<T, SimdSize>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x)
+    { []<class T, class SimdModel>(universal_simd<T, SimdModel>&){}(x); };
 
 /// Helper class to auto-generate either a `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct auto_simd
 {
   /// Universal simd type.
-  using type = universal_simd<T, SimdSize>;
+  using type = universal_simd<T, SimdModel>;
 };
 
 /// Specialization of \ref auto_simd for the `stdx::simd` variant,
 /**
  * @tparam T Arithmetic value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<simd_arithmetic T, int SimdSize>
-struct auto_simd<T, SimdSize>
+template<simd_arithmetic T, class SimdModel>
+struct auto_simd<T, SimdModel>
 {
   /// stdx::simd type.
-  using type = stdx::fixed_size_simd<T, SimdSize>;
+  using type = stdx::rebind_simd_t<T, SimdModel>;
 };
 
 /// Type which resolves either to `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type. If arithmetic, the resulting type is a `stdx::simd`. Otherwise it is a `universal_simd`.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
-using auto_simd_t = typename auto_simd<T, SimdSize>::type;
+template<class T, class SimdModel>
+using auto_simd_t = typename auto_simd<T, SimdModel>::type;
 
 } //namespace simd_access
 
@@ -5396,7 +5639,7 @@ namespace simd_access
 {
 
 /// Forward declaration
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct universal_simd;
 
 template<typename T>
@@ -5410,44 +5653,45 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
   stdx_simd<PotentialSimdType> ||
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, int SimdSize>(universal_simd<T, SimdSize>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x)
+    { []<class T, class SimdModel>(universal_simd<T, SimdModel>&){}(x); };
 
 /// Helper class to auto-generate either a `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct auto_simd
 {
   /// Universal simd type.
-  using type = universal_simd<T, SimdSize>;
+  using type = universal_simd<T, SimdModel>;
 };
 
 /// Specialization of \ref auto_simd for the `stdx::simd` variant,
 /**
  * @tparam T Arithmetic value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<simd_arithmetic T, int SimdSize>
-struct auto_simd<T, SimdSize>
+template<simd_arithmetic T, class SimdModel>
+struct auto_simd<T, SimdModel>
 {
   /// stdx::simd type.
-  using type = stdx::fixed_size_simd<T, SimdSize>;
+  using type = stdx::rebind_simd_t<T, SimdModel>;
 };
 
 /// Type which resolves either to `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type. If arithmetic, the resulting type is a `stdx::simd`. Otherwise it is a `universal_simd`.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
-using auto_simd_t = typename auto_simd<T, SimdSize>::type;
+template<class T, class SimdModel>
+using auto_simd_t = typename auto_simd<T, SimdModel>::type;
 
 } //namespace simd_access
 
@@ -5471,13 +5715,15 @@ namespace simd_access
 /// Specifies a location for a simd variable stored in memory as a consecutive sequence of elements.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct linear_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to the first element of the sequence.
   T* base_;
 
@@ -5489,7 +5735,7 @@ struct linear_location
   template<auto Member>
   auto member_access() const
   {
-    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize>{&(base_->*Member)};
+    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel>{&(base_->*Member)};
   }
 
   /// Creation of a linear location for an element of `T`, if `T` is an array.
@@ -5499,21 +5745,23 @@ struct linear_location
    */
   auto array_access(auto i) const
   {
-    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize>{&((*base_)[i])};
+    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel>{&((*base_)[i])};
   }
 };
 
 /// Specifies a location for a simd variable with the indices of its values stored in an array.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ArrayType Type of the array, which stores the indices.
  */
-template<class T, int SimdSize, class ArrayType>
+template<class T, class SimdModel, class ArrayType>
 struct indexed_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to element zero of the sequence.
   T* base_;
   /// Reference to the index array.
@@ -5527,7 +5775,7 @@ struct indexed_location
   template<auto Member>
   auto member_access() const
   {
-    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel, ArrayType>
       {&(base_->*Member), indices_};
   }
 
@@ -5538,7 +5786,7 @@ struct indexed_location
    */
   auto array_access(auto i) const
   {
-    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel, ArrayType>
       {&((*base_)[i]), indices_};
   }
 };
@@ -5578,7 +5826,7 @@ namespace simd_access
 {
 
 /// Forward declaration
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct universal_simd;
 
 template<typename T>
@@ -5592,44 +5840,45 @@ concept specialization_of =
 
 template<class PotentialSimdType>
 concept stdx_simd =
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class SimdModel>(stdx::simd<T, SimdModel>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, class Abi>(stdx::simd<T, Abi>&){}(x); };
 
 template<class PotentialSimdType>
 concept any_simd =
   stdx_simd<PotentialSimdType> ||
-  requires(std::remove_cvref_t<PotentialSimdType> x) { []<class T, int SimdSize>(universal_simd<T, SimdSize>&){}(x); };
+  requires(std::remove_cvref_t<PotentialSimdType> x)
+    { []<class T, class SimdModel>(universal_simd<T, SimdModel>&){}(x); };
 
 /// Helper class to auto-generate either a `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct auto_simd
 {
   /// Universal simd type.
-  using type = universal_simd<T, SimdSize>;
+  using type = universal_simd<T, SimdModel>;
 };
 
 /// Specialization of \ref auto_simd for the `stdx::simd` variant,
 /**
  * @tparam T Arithmetic value type.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<simd_arithmetic T, int SimdSize>
-struct auto_simd<T, SimdSize>
+template<simd_arithmetic T, class SimdModel>
+struct auto_simd<T, SimdModel>
 {
   /// stdx::simd type.
-  using type = stdx::fixed_size_simd<T, SimdSize>;
+  using type = stdx::rebind_simd_t<T, SimdModel>;
 };
 
 /// Type which resolves either to `stdx::simd` or - if not applicable - a \ref universal_simd.
 /**
  * @tparam T Value type. If arithmetic, the resulting type is a `stdx::simd`. Otherwise it is a `universal_simd`.
- * @tparam SimdSize Requested simd size.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
-using auto_simd_t = typename auto_simd<T, SimdSize>::type;
+template<class T, class SimdModel>
+using auto_simd_t = typename auto_simd<T, SimdModel>::type;
 
 } //namespace simd_access
 
@@ -5653,13 +5902,15 @@ namespace simd_access
 /// Specifies a location for a simd variable stored in memory as a consecutive sequence of elements.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  */
-template<class T, int SimdSize>
+template<class T, class SimdModel>
 struct linear_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to the first element of the sequence.
   T* base_;
 
@@ -5671,7 +5922,7 @@ struct linear_location
   template<auto Member>
   auto member_access() const
   {
-    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize>{&(base_->*Member)};
+    return linear_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel>{&(base_->*Member)};
   }
 
   /// Creation of a linear location for an element of `T`, if `T` is an array.
@@ -5681,21 +5932,23 @@ struct linear_location
    */
   auto array_access(auto i) const
   {
-    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize>{&((*base_)[i])};
+    return linear_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel>{&((*base_)[i])};
   }
 };
 
 /// Specifies a location for a simd variable with the indices of its values stored in an array.
 /**
  * @tparam T Value type of the simd variable.
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ArrayType Type of the array, which stores the indices.
  */
-template<class T, int SimdSize, class ArrayType>
+template<class T, class SimdModel, class ArrayType>
 struct indexed_location
 {
   /// Generalized access to `T`.
   using value_type = T;
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
   /// Pointer to element zero of the sequence.
   T* base_;
   /// Reference to the index array.
@@ -5709,7 +5962,7 @@ struct indexed_location
   template<auto Member>
   auto member_access() const
   {
-    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype(std::declval<T>().*Member)>, SimdModel, ArrayType>
       {&(base_->*Member), indices_};
   }
 
@@ -5720,7 +5973,7 @@ struct indexed_location
    */
   auto array_access(auto i) const
   {
-    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdSize, ArrayType>
+    return indexed_location<std::remove_reference_t<decltype((*base_)[i])>, SimdModel, ArrayType>
       {&((*base_)[i]), indices_};
   }
 };
@@ -5737,17 +5990,20 @@ class value_access;
 
 /// Class representing a simd index to a consecutive sequence of elements.
 /**
- * @tparam SimdSize Length of the simd sequence.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam IndexType Type of the scalar index.
  */
-template<int SimdSize, class IndexType = size_t>
+template<class SimdModel, class IndexType = size_t>
 struct index
 {
+  /// Generalized access to `SimdModel`.
+  using simd_model_type = SimdModel;
+
   /// Return the length of the simd sequence.
   /**
    * @return The length of the simd sequence.
    */
-  static constexpr int size() { return SimdSize; }
+  static auto size() { return SimdModel::size(); }
 
   /// Return the scalar index of a vector lane.
   /**
@@ -5768,7 +6024,7 @@ struct index
   template<class T>
   auto operator[](T* data) const
   {
-    return value_access<linear_location<T, SimdSize>, sizeof(T)>(linear_location<T, SimdSize>{data + index_});
+    return value_access<linear_location<T, SimdModel>, sizeof(T)>(linear_location<T, SimdModel>{data + index_});
   }
 
   /// Transforms this to a simd value.
@@ -5777,27 +6033,27 @@ struct index
    */
   auto to_simd() const
   {
-    return stdx::fixed_size_simd<IndexType, SimdSize>([this](auto i){ return IndexType(index_ + i); });
+    return stdx::rebind_simd_t<IndexType, SimdModel>([this](auto i){ return IndexType(index_ + i); });
   }
 };
 
 template<class PotentialIndexType>
 concept simd_index =
   (stdx_simd<PotentialIndexType> && std::is_integral_v<typename PotentialIndexType::value_type>) ||
-  requires(std::remove_cvref_t<PotentialIndexType> x) { []<int SimdSize, class IndexType>(index<SimdSize, IndexType>&){}(x); };
+  requires(std::remove_cvref_t<PotentialIndexType> x) { []<class SimdModel, class IndexType>(index<SimdModel, IndexType>&){}(x); };
 
 /// TODO: Introduce masked_index to support e.g. residual masked loops.
 
 /// Returns the scalar index of a specific vector lane for a linear index.
 /**
- * @tparam SimdSize Deduced simd size.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam IndexType Deduced type of the scalar index.
  * @param idx Linear simd index.
  * @param i Vector lane.
  * @return The scalar index at vector lane `i`, i.e. `idx.start + i`.
  */
-template<int SimdSize, class IndexType>
-inline auto scalar_index(const index<SimdSize, IndexType>& idx, auto i)
+template<class SimdModel, class IndexType>
+inline auto scalar_index(const index<SimdModel, IndexType>& idx, auto i)
 {
   return idx.scalar_index(i);
 }
@@ -5818,20 +6074,37 @@ inline auto scalar_index(const stdx::simd<IndexType, SimdModel>& idx, auto i)
 
 /// Returns true, if the argument is a simd index (i.e. fullfills the concept `simd_index`).
 /**
- * @tparam IndexType Deduced integral type of the scalar index.
- * @tparam SimdModel Deduced abi of the `simd` paramter.
- * @param idx Indirect simd index.
- * @param i Vector lane.
- * @return The scalar index at vector lane `i`, i.e. `idx[i]`.
+ * @param idx Potential simd index.
+ * @return True, if the type of idx fulfills `simd_index` concept.
  */
- constexpr inline auto is_simd_index(auto&& idx)
+constexpr inline auto is_simd_index(auto&& idx)
 {
   return simd_index<decltype(idx)>;
 }
 
+template<class T>
+struct index_model;
+
+template<class SimdModel, class IndexType>
+struct index_model<index<SimdModel, IndexType>>
+{
+  using type = SimdModel;
+};
+
+template<std::integral Index, class Abi>
+struct index_model<stdx::simd<Index, Abi>>
+{
+  using type = stdx::simd<Index, Abi>;
+};
+
+template<simd_index T>
+using index_model_t = typename index_model<T>::type;
+
 } //namespace simd_access
 
 #endif //SIMD_ACCESS_INDEX
+
+#include <experimental/bits/simd.h>
 
 namespace simd_access
 {
@@ -5841,12 +6114,13 @@ namespace simd_access
  * stored at the positions base, base+ElementSize, base+2*ElementSize, ...
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Deduced type of a simd element.
- * @tparam SimdSize Deduced vector size of the simd type.
+ * @tparam SimdModel Deduced simd type acting as type model.
+ * @tparam Abi Deduced Abi tag type.
  * @param location Address of the memory location, at which the first simd element is stored.
  * @param source Simd value to be stored.
  */
-template<size_t ElementSize, simd_arithmetic T, int SimdSize>
-inline void store(const linear_location<T, SimdSize>& location, const stdx::fixed_size_simd<T, SimdSize>& source)
+template<size_t ElementSize, simd_arithmetic T, class SimdModel, class Abi>
+inline void store(const linear_location<T, SimdModel>& location, const stdx::simd<T, Abi>& source)
 {
   if constexpr (sizeof(T) == ElementSize)
   {
@@ -5855,7 +6129,7 @@ inline void store(const linear_location<T, SimdSize>& location, const stdx::fixe
   else
   {
     // scatter with constant pitch
-    for (int i = 0; i < SimdSize; ++i)
+    for (int i = 0; i < source.size(); ++i)
     {
       *reinterpret_cast<T*>(reinterpret_cast<char*>(location.base_) + ElementSize * i) = source[i];
     }
@@ -5867,17 +6141,17 @@ inline void store(const linear_location<T, SimdSize>& location, const stdx::fixe
  * stored at the positions base+indices[0]*ElementSize, base+indices[1]*ElementSize, ...
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Deduced type of a simd element.
- * @tparam SimdSize Deduced vector size of the simd type.
+ * @tparam SimdModel Deduced simd type acting as type model.
+ * @tparam Abi Deduced Abi tag type.
  * @tparam ArrayType Deduced type of the array storing the indices.
  * @param location Address and indices of the memory location.
  * @param source Simd value to be stored.
  */
-template<size_t ElementSize, simd_arithmetic T, int SimdSize, class ArrayType>
-inline void store(const indexed_location<T, SimdSize, ArrayType>& location,
-  const stdx::fixed_size_simd<T, SimdSize>& source)
+template<size_t ElementSize, simd_arithmetic T, class SimdModel, class Abi, class ArrayType>
+inline void store(const indexed_location<T, SimdModel, ArrayType>& location, const stdx::simd<T, Abi>& source)
 {
   // scatter with indirect indices
-  for (int i = 0; i < SimdSize; ++i)
+  for (int i = 0; i < source.size(); ++i)
   {
     *reinterpret_cast<T*>(reinterpret_cast<char*>(location.base_) + ElementSize * location.indices_[i]) = source[i];
   }
@@ -5888,14 +6162,14 @@ inline void store(const indexed_location<T, SimdSize, ArrayType>& location,
  * loaded are located at the positions base, base+ElementSize, base+2*ElementSize, ...
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Type of a simd element.
- * @tparam SimdSize Vector size of the simd type.
+ * @tparam SimdModel Deduced simd type acting as type model.
  * @param location Address of the memory location, at which the first scalar element is stored.
  * @return A simd value.
  */
-template<size_t ElementSize, simd_arithmetic T, int SimdSize>
-inline auto load(const linear_location<T, SimdSize>& location)
+template<size_t ElementSize, simd_arithmetic T, class SimdModel>
+inline auto load(const linear_location<T, SimdModel>& location)
 {
-  using ResultType = stdx::fixed_size_simd<std::remove_const_t<T>, SimdSize>;
+  using ResultType = stdx::rebind_simd_t<std::remove_const_t<T>, SimdModel>;
   if constexpr (sizeof(T) == ElementSize)
   {
     return ResultType(location.base_, stdx::element_aligned);
@@ -5915,16 +6189,17 @@ inline auto load(const linear_location<T, SimdSize>& location)
  * loaded are stored at the positions base+indices[0]*ElementSize, base+indices[1]*ElementSize, ...
  * @tparam ElementSize Size in bytes of the type of the simd-indexed element.
  * @tparam T Deduced type of a simd element.
- * @tparam SimdSize Deduced vector size of the simd type.
+ * @tparam SimdModel Simd type acting as type model.
  * @tparam ArrayType Deduced type of the array storing the indices.
  * @param location Address and indices of the memory location.
  * @return A simd value.
  */
-template<size_t ElementSize, simd_arithmetic T, int SimdSize, class ArrayType>
-inline auto load(const indexed_location<T, SimdSize, ArrayType>& location)
+template<size_t ElementSize, simd_arithmetic T, class SimdModel, class ArrayType>
+inline auto load(const indexed_location<T, SimdModel, ArrayType>& location)
 {
+  using ResultType = stdx::rebind_simd_t<std::remove_const_t<T>, SimdModel>;
   // gather with indirect indices
-  return stdx::fixed_size_simd<std::remove_const_t<T>, SimdSize>([&](int i)
+  return ResultType([&](int i)
     {
       return *reinterpret_cast<const T*>
         (reinterpret_cast<const char*>(location.base_) + ElementSize * location.indices_[i]);
@@ -5942,7 +6217,8 @@ inline auto load(const indexed_location<T, SimdSize, ArrayType>& location)
 template<simd_arithmetic BaseType, simd_index IndexType>
 inline auto load_rvalue(auto&& base, const IndexType& idx)
 {
-  return stdx::fixed_size_simd<BaseType, IndexType::size()>([&](auto i) { return base[scalar_index(idx, i)]; });
+  using ResultType = stdx::rebind_simd_t<BaseType, index_model_t<IndexType>>;
+  return ResultType([&](auto i) { return base[scalar_index(idx, i)]; });
 }
 
 /**
@@ -5958,7 +6234,8 @@ inline auto load_rvalue(auto&& base, const IndexType& idx)
 template<simd_arithmetic BaseType, simd_index IndexType>
 inline auto load_rvalue(auto&& base, const IndexType& idx, auto&& subobject)
 {
-  return stdx::fixed_size_simd<BaseType, IndexType::size()>([&](auto i)
+  using ResultType = stdx::rebind_simd_t<BaseType, index_model_t<IndexType>>;
+  return ResultType([&](auto i)
   {
     return subobject(base[scalar_index(idx, i)]);
   });
@@ -6141,14 +6418,14 @@ struct LValueSeparator<true>
 
   /// Computes the base address of a given array for a linear simd access.
   /**
-   * @tparam SimdSize Deduced simd size (number of vector lanes) of the access.
+   * @tparam SimdModel Simd type acting as type model.
    * @tparam IndexType Deduced integral type of the scalar index.
    * @param base_addr Array base.
    * @param i A linear simd index.
    * @return The address of the starting array element in the element sequence defined by `i`.
    */
-  template<int SimdSize, std::integral IndexType>
-  static auto get_base_address(auto&& base_addr, const index<SimdSize, IndexType>& i)
+  template<class SimdModel, std::integral IndexType>
+  static auto get_base_address(auto&& base_addr, const index<SimdModel, IndexType>& i)
   {
     return &base_addr[i.index_];
   }
@@ -6156,27 +6433,27 @@ struct LValueSeparator<true>
   /// Computes the base address of a given array for an indirect simd access using indices in `stdx::simd`.
   /**
    * @tparam IndexType Deduced integral type of the scalar index.
-   * @tparam SimdModel Deduced abi of the `simd` paramter.
+   * @tparam Abi Deduced abi of the `simd` paramter.
    * @param base_addr Array base.
    * @return The address of the first array element.
    */
-  template<std::integral IndexType, class SimdModel>
-  static auto get_base_address(auto&& base_addr, const stdx::simd<IndexType, SimdModel>&)
+  template<std::integral IndexType, class Abi>
+  static auto get_base_address(auto&& base_addr, const stdx::simd<IndexType, Abi>&)
   {
     return &base_addr[0];
   }
 
   /// Computes the base address of a member of array elements for an linear simd access.
   /**
-   * @tparam SimdSize Deduced simd size (number of vector lanes) of the access.
+   * @tparam SimdModel Simd type acting as type model.
    * @tparam IndexType Deduced integral type of the scalar index.
    * @param base_addr Array base.
    * @param i A linear simd index.
    * @param subobject A functor yielding a member of the array element.
    * @return The address of the member of the starting array element in the element sequence defined by `i`.
    */
-  template<int SimdSize, std::integral IndexType>
-  static auto get_base_address(auto&& base_addr, const index<SimdSize, IndexType>& i, auto&& subobject)
+  template<class SimdModel, std::integral IndexType>
+  static auto get_base_address(auto&& base_addr, const index<SimdModel, IndexType>& i, auto&& subobject)
   {
     return &subobject(base_addr[i.index_]);
   }
@@ -6184,13 +6461,13 @@ struct LValueSeparator<true>
   /// Computes the base address of a member of array elements for an indirect simd access using indices in `stdx::simd`.
   /**
    * @tparam IndexType Deduced integral type of the scalar index.
-   * @tparam SimdModel Deduced abi of the `simd` paramter.
+   * @tparam Abi Deduced abi of the `simd` paramter.
    * @param base_addr Array base.
    * @param subobject A functor yielding a member of the array element.
    * @return The address of the member of the first array element.
    */
-  template<std::integral IndexType, class SimdModel>
-  static auto get_base_address(auto&& base_addr, const stdx::simd<IndexType, SimdModel>&, auto&& subobject)
+  template<std::integral IndexType, class Abi>
+  static auto get_base_address(auto&& base_addr, const stdx::simd<IndexType, Abi>&, auto&& subobject)
   {
     return &subobject(base_addr[0]);
   }
@@ -6199,15 +6476,15 @@ struct LValueSeparator<true>
   /**
    * @tparam ElementSize Size of an array element.
    * @tparam T Deduced type of the simd-accessed element.
-   * @tparam SimdSize Deduced simd size (number of vector lanes) of the access.
+   * @tparam SimdModel Simd type acting as type model.
    * @tparam IndexType Deduced integral type of the scalar index.
    * @param base Pointer to the first element (or one of its members) in the sequence defined by `i`.
    * @return A value access object (see \ref value_access), which can be used as lhs in assignments.
    */
-  template<size_t ElementSize, class T, int SimdSize, std::integral IndexType>
-  static auto get_direct_value_access(T* base, const index<SimdSize, IndexType>&)
+  template<size_t ElementSize, class T, class SimdModel, std::integral IndexType>
+  static auto get_direct_value_access(T* base, const index<SimdModel, IndexType>&)
   {
-    return make_value_access<ElementSize>(linear_location<T, SimdSize>{base});
+    return make_value_access<ElementSize>(linear_location<T, SimdModel>{base});
   }
 
   /// Creates a value access object for an indirect simd access using indices in `stdx::simd`.
@@ -6215,15 +6492,15 @@ struct LValueSeparator<true>
    * @tparam ElementSize Size of an array element.
    * @tparam T Deduced type of the simd-accessed element.
    * @tparam IndexType Deduced integral type of the scalar index.
-   * @tparam SimdModel Deduced abi of the `simd` paramter.
+   * @tparam Abi Deduced abi of the `simd` paramter.
    * @param base Pointer to the first array element or one of its members.
    * @param idx SIMD index.
    * @return A value access object (see \ref value_access), which can be used as lhs in assignments.
    */
-  template<size_t ElementSize, class T, std::integral IndexType, class SimdModel>
-  static auto get_direct_value_access(T* base, const stdx::simd<IndexType, SimdModel>& idx)
+  template<size_t ElementSize, class T, std::integral IndexType, class Abi>
+  static auto get_direct_value_access(T* base, const stdx::simd<IndexType, Abi>& idx)
   {
-    using location_type = indexed_location<T, stdx::simd<IndexType, SimdModel>::size(), stdx::simd<IndexType, SimdModel>>;
+    using location_type = indexed_location<T, stdx::simd<IndexType, Abi>, stdx::simd<IndexType, Abi>>;
     return make_value_access<ElementSize>(location_type{base, idx});
   }
 

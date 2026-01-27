@@ -67,6 +67,50 @@ struct index
   {
     return stdx::rebind_simd_t<IndexType, SimdModel>([this](auto i){ return IndexType(index_ + i); });
   }
+
+  /// Addition of a simd index and a scalar.
+  /**
+   * @param idx Simd index.
+   * @param value Scalar value.
+   * @return A simd index `result` so that `result[i] == idx[i] + value` for `i = [0, SimdSize)`.
+   */
+  friend auto operator+(const index& idx, IndexType value)
+  {
+    return index{idx.index_ + value};
+  }
+
+  /// Addition of a simd index and a scalar.
+  /**
+   * @param value Scalar value.
+   * @param idx Simd index.
+   * @return A simd index `result` so that `result[i] == idx[i] + value` for `i = [0, SimdSize)`.
+   */
+  friend auto operator+(IndexType value, const index& idx)
+  {
+    return index{idx.index_ + value};
+  }
+
+  /// Multiplication of a simd index and a scalar.
+  /**
+   * @param idx Simd index.
+   * @param value Scalar value.
+   * @return An stdx::simd<IndexType> `result` so that `result[i] == idx[i] * value` for `i = [0, SimdSize)`.
+   */
+  friend auto operator*(const index& idx, IndexType value)
+  {
+    return idx.to_simd() * value;
+  }
+
+  /// Multiplication of a simd index and a scalar.
+  /**
+   * @param value Scalar value.
+   * @param idx Simd index.
+   * @return A stdx::simd<IndexType> `result` so that `result[i] == idx[i] * value` for `i = [0, SimdSize)`.
+   */
+  friend auto operator*(IndexType value, const index& idx)
+  {
+    return idx.to_simd() * value;
+  }
 };
 
 template<class PotentialIndexType>

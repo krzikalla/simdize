@@ -31,7 +31,7 @@ constexpr auto VectorResidualLoop = VectorResidualLoopT();
  * @tparam SimdModel Simd type acting as type model.
  * @param start Start of the iteration range [start, end).
  * @param end End of the iteration range [start, end).
- * @param fn Generic function to be called. Takes one argument, whose type is either `index<SimdSize, IntegralType>`
+ * @param fn Generic function to be called. Takes one argument, whose type is either `index<SimdModel, IntegralType>`
  *   or `IntegralType`.
  * @param residualLoopPolicy Determines the execution policy of residual iterations. If `ScalarResidualLoop`, residual
  *   iterations are executed one by one. If `VectorResidualLoop`, residual iterations are executed vectorized. In that
@@ -84,7 +84,7 @@ inline void loop(std::integral auto start, std::integral auto end, auto&& fn,
  * @param alignTestFn Generic function to be called. Takes one scalar argument of the common type of `start` and `end`.
  *   Once it returns true, it isn't called anymore and the function starts to call `fn` with simd indices
  *   (including the index for which `alignTestFn` returned `true`).
- * @param fn Generic function to be called. Takes one argument, whose type is either `index<SimdSize, IntegralType>`
+ * @param fn Generic function to be called. Takes one argument, whose type is either `index<SimdModel, IntegralType>`
  *   or `IntegralType`.
  */
 template<class SimdModel, auto ... Args>
@@ -189,7 +189,7 @@ inline void loop(IteratorType start, const IteratorType& end, auto&& fn,
  * @param start Inclusive start of the range of indices.
  * @param end Exclusive end of the range of indices.
  * @param fn Generic function to be called. Takes two arguments. The first is the linear index starting at 0, its
- *   type is either `index<SimdSize, size_t>` or `size_t`. The second argument is the indirect index, its type is
+ *   type is either `index<SimdModel, size_t>` or `size_t`. The second argument is the indirect index, its type is
  *   either `stdx::simd<IntegralType, SimdSize>` or `IntegralType` (which is `*start`).
  * @param residualLoopPolicy Determines the execution policy of residual iterations. If `ScalarResidualLoop`, residual
  *   iterations are executed one by one. If `VectorResidualLoop`, residual iterations are executed vectorized. In that
@@ -231,6 +231,43 @@ inline void loop_with_linear_index(IteratorType start, const IteratorType& end, 
         fn.template operator()<Args...>(i.index_, *(start + i.index_));
       }
     }
+  }
+}
+
+/**
+ * Linear two-dimensional simd-ized iteration over a function. The loop consist of an outer and an inner loop.
+ * First, the function is called with a simd index for the outer loop, but all remainding iterations are left out.
+ * Then, the function is called with a simd index for the inner loop and for the remainding iterations with two
+ * integral indices.
+ * @tparam SimdModel Simd type acting as type model.
+ * @param start_outer Start of the iteration range [start, end) of the outer loop.
+ * @param end_outer End of the iteration range [start, end) of the outer loop.
+ * @param start_inner Start of the iteration range [start, end) of the inner loop.
+ * @param end_inner End of the iteration range [start, end) of the inner loop.
+ * @param fn Generic function to be called. Takes two arguments, whose types are either `index<SimdModel, IntegralType>`
+ *   or `IntegralType`. The first argument corresponds to the outer loop, the argument corresponds to the inner loop.
+ */
+template<class SimdModel, auto ... Args>
+inline void loop_2d(std::integral auto start_outer, std::integral auto end_outer,
+  std::integral auto start_inner, std::integral auto end_inner, auto&& fn)
+{
+  using IndexTypeOuter = std::common_type_t<decltype(start_outer), decltype(start_outer)>;
+  using IndexTypeInner = std::common_type_t<decltype(start_inner), decltype(end_inner)>;
+  const auto simdSize = SimdModel::size();
+  auto aligned_end_outer = start_outer + ((end_outer - start_outer) / simdSize) * simdSize;
+  loop<SimdModel, Args...>(start_outer, aligned_end_outer, [&](auto i)
+  {
+    for (IndexTypeInner j = start_inner; j < end_inner; ++j)
+    {
+      fn(i, j);
+    }
+  }, VectorResidualLoop);
+  for (IndexTypeOuter i = aligned_end_outer; i < end_outer; ++i)
+  {
+    loop<SimdModel, Args...>(start_inner, end_inner, [&](auto j)
+    {
+      fn(i, j);
+    });
   }
 }
 

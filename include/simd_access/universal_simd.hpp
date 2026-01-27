@@ -28,7 +28,7 @@ struct universal_simd : std::array<T, SimdModel::size()>
 {
   /// Static version of `size()` (as provided by `stdx::simd`, but not by `std::array`).
   /**
-   * @return `SimdSize`
+   * @return `SimdSize`, i.e. `SimdModel::size()`.
    */
   static constexpr auto size() { return SimdModel::size(); }
 

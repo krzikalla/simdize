@@ -154,7 +154,7 @@ The functor is either called with a simd index or for the residual iterations wi
 // SimdModel: Simd type acting as type model.
 // start Start of the iteration range [start, end).
 // end End of the iteration range [start, end).
-// fn: Generic functor to be called. Takes one argument, whose type is either `index<SimdSize>`
+// fn: Generic functor to be called. Takes one argument, whose type is either `index<SimdModel>`
 // or an integral type for the residual iterations.
 template<class SimdModel>
 void loop(std::integral auto start, std::integral auto end, auto&& fn);
@@ -222,3 +222,22 @@ e.g. setting global mask registers (ARM SVE).
 
 The lib is header-only. The tests need cmake and a c++20 compliant compiler.
 Note, that the tests use class template argument deduction for aggregates, thus for clang a version >= 17 is required.
+
+### Citing
+
+Please consider citing us accordingly in your derived work and publications:
+```
+% Peer-Reviewed Publication %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Peer reviewed and accepted publication in
+%   "2025 IEEE International Conference on High Performance
+%    Computing and Communications (HPCC)"
+@INPROCEEDINGS{Krzikalla11207437,
+  author={Krzikalla, Olaf and Wendler, Johannes and Huismann, Immo},
+  booktitle={2025 IEEE International Conference on High Performance Computing and Communications (HPCC)},
+  title={Explicit SIMD Vectorization with Modern C++},
+  year={2025},
+  pages={103-110},
+  doi={10.1109/HPCC67675.2025.00033}
+}
+```
